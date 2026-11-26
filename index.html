@@ -86,7 +86,8 @@ p{margin:0;max-width:66ch}
 .pressure-key i{width:84px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--lp),var(--mid),var(--hp))}
 
 /* sections */
-main{display:grid;gap:0}
+main{display:grid;gap:0;grid-template-columns:minmax(0,1fr)}
+main>section{min-width:0}
 section.s{padding-block:72px;border-bottom:1px solid var(--line)}
 section.s:nth-of-type(even){background:var(--bg2)}
 .sh{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:end;margin-bottom:30px}
