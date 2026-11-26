@@ -392,6 +392,28 @@ footer .wrap{display:grid;gap:12px}
 .photo img{max-height:340px;width:auto}
 .card>*:not(.spot),.tablewrap>*:not(.spot),.eqs>*:not(.spot),.sheet>*:not(.spot){position:relative;z-index:1}
 
+/* figures d'ingénierie */
+.fighead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px}
+.figtag{font:600 .8rem var(--f-disp);letter-spacing:.08em;text-transform:uppercase;color:#fff}
+.figscroll{overflow-x:auto;min-width:0;max-width:100%}
+.fig-wide .figscroll svg{min-width:720px}
+.eng text{font-family:var(--f-mono);fill:var(--ink)}
+.eng .t-s{font-size:10.5px;fill:var(--muted)}
+.eng .t-m{font-size:12px}
+.eng .t-b{font-size:13px;font-weight:700;fill:#fff}
+.eng .t-tag{font-size:11px;font-weight:700;fill:var(--accent)}
+.eng .t-disp{font-family:var(--f-disp);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.eng .box{fill:rgba(6,18,32,.92);stroke:var(--line2);stroke-width:1}
+.eng .box.acc{stroke:var(--accent);fill:rgba(34,240,255,.08)}
+.eng .box.fp{stroke:var(--accent2);fill:rgba(255,47,208,.1)}
+.eng .grid{stroke:rgba(90,210,255,.09);stroke-width:1}
+.eng .axis{stroke:var(--muted);stroke-width:1}
+.eng .glow{filter:drop-shadow(0 0 4px currentColor)}
+#cinematique .cols>figure{grid-column:1/-1}
+#cinematique .cols>figure svg{max-height:560px}
+#cinematique .cols>.stack{grid-column:1/-1;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 36px}
+#cinematique .cols>.stack>figure{grid-column:2;grid-row:1/span 2}
+@media (max-width:980px){#cinematique .cols>.stack{grid-template-columns:1fr}#cinematique .cols>.stack>figure{grid-column:auto;grid-row:auto}}
 @media (max-width:980px){
   .hero .wrap{grid-template-columns:1fr}
   .stage{max-height:460px;margin-inline:auto}
@@ -482,7 +504,7 @@ footer .wrap{display:grid;gap:12px}
   </div>
   <div class="tblock"><div class="wrap">
     <div><span>Doc.</span><b>SAÉ1.1‑CS‑DT</b></div>
-    <div><span><span data-l="fr">Révision</span><span data-l="en">Revision</span></span><b>D</b></div>
+    <div><span><span data-l="fr">Révision</span><span data-l="en">Revision</span></span><b>E</b></div>
     <div><span><span data-l="fr">Unités</span><span data-l="en">Units</span></span><b>SI · mm · bar · kW</b></div>
     <div><span>Projection</span><b><span data-l="fr">Européenne</span><span data-l="en">First angle</span></b></div>
     <div><span><span data-l="fr">Fluide</span><span data-l="en">Fluid</span></span><b>R134a</b></div>
@@ -499,33 +521,6 @@ footer .wrap{display:grid;gap:12px}
       <p><span data-l="fr">Le compresseur est le cœur de la boucle de climatisation. Il aspire le fluide frigorigène gazeux, froid et à basse pression, sortant de l’évaporateur, et le refoule chaud et à haute pression vers le condenseur.</span><span data-l="en">The compressor is the heart of the air-conditioning loop. It draws in cold, low-pressure refrigerant gas from the evaporator and pushes it out hot and at high pressure toward the condenser.</span></p>
       <p><span data-l="fr">Cette différence de pression permet au fluide de céder sa chaleur à l’air extérieur dans le condenseur, puis, après le détendeur, de prendre la chaleur de l’air de l’habitacle dans l’évaporateur.</span><span data-l="en">This pressure difference lets the refrigerant give off heat to the outside air in the condenser, then, after the expansion valve, absorb heat from the cabin air in the evaporator.</span></p>
       <p class="note"><span data-l="fr">On l’appelle aussi compresseur à spirales, pompe scroll ou pompe à vide scroll. On le préfère aux compresseurs rotatifs ou alternatifs (à pistons) dans la climatisation des maisons et des voitures.</span><span data-l="en">It is also called a spiral compressor, scroll pump or scroll vacuum pump. It is preferred to rotary or reciprocating (piston) compressors in home and car air conditioning.</span></p>
-      <figure class="card">
-        <svg viewBox="0 0 640 330" role="img" aria-label="Boucle de climatisation">
-          <path class="flow st-hp" d="M150 230 V70 H300"/>
-          <path class="flow st-hp" d="M440 70 H560 V140"/>
-          <path class="flow st-lp" d="M560 200 V280 H420"/>
-          <path class="flow st-lp" d="M290 280 H150 V250"/>
-          <g font-size="15" font-weight="600">
-            <rect x="80" y="180" width="140" height="70" rx="10" class="fi-accent"/>
-            <text x="150" y="211" text-anchor="middle" fill="#1a1205" data-l="fr">Compresseur</text><text x="150" y="211" text-anchor="middle" fill="#1a1205" data-l="en">Compressor</text>
-            <text x="150" y="232" text-anchor="middle" fill="#1a1205" font-size="12" font-weight="500">scroll</text>
-            <rect x="300" y="40" width="140" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
-            <text x="370" y="68" text-anchor="middle" class="fi-ink" data-l="fr">Condenseur</text><text x="370" y="68" text-anchor="middle" class="fi-ink" data-l="en">Condenser</text>
-            <text x="370" y="87" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">cède la chaleur dehors</text><text x="370" y="87" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">rejects heat outside</text>
-            <rect x="500" y="140" width="120" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
-            <text x="560" y="168" text-anchor="middle" class="fi-ink" data-l="fr">Détendeur</text><text x="560" y="168" text-anchor="middle" class="fi-ink" data-l="en">Expansion valve</text>
-            <text x="560" y="187" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">chute de pression</text><text x="560" y="187" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">pressure drop</text>
-            <rect x="290" y="250" width="130" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
-            <text x="355" y="278" text-anchor="middle" class="fi-ink" data-l="fr">Évaporateur</text><text x="355" y="278" text-anchor="middle" class="fi-ink" data-l="en">Evaporator</text>
-            <text x="355" y="297" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">refroidit l’habitacle</text><text x="355" y="297" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">cools the cabin</text>
-          </g>
-          <g font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">
-            <text x="168" y="130" class="fi-hp" data-l="fr">HP ≈ 15 bar · 80 °C</text><text x="168" y="130" class="fi-hp" data-l="en">HP ≈ 15 bar · 80 °C</text>
-            <text x="168" y="300" class="fi-lp">BP/LP ≈ 2 bar · 5 °C</text>
-          </g>
-        </svg>
-        <figcaption><span data-l="fr">Boucle frigorifique. Rouge : haute pression (refoulement). Bleu : basse pression (aspiration). Valeurs usuelles pour le R134a.</span><span data-l="en">Refrigeration loop. Red: high pressure (discharge). Blue: low pressure (suction). Typical values for R134a.</span></figcaption>
-      </figure>
     </div>
     <div class="stack">
       <figure class="card">
@@ -552,6 +547,11 @@ footer .wrap{display:grid;gap:12px}
       <figcaption style="font-size:.84rem;color:var(--muted)"><span data-l="fr">Le compresseur étudié en TP : poulie noire à 6 gorges en haut, corps en aluminium moulé, étiquette HFC134a.</span><span data-l="en">The compressor studied in the lab: black 6-rib pulley on top, cast aluminium body, HFC134a label.</span></figcaption>
     </div>
   </div>
+  <figure class="card fig-wide" style="margin-top:34px">
+    <div class="fighead"><span class="eyebrow">P&amp;ID · ISO 14617</span><span class="figtag" data-l="fr">Schéma de principe du circuit</span><span class="figtag" data-l="en">Circuit flow diagram</span></div>
+    <div class="figscroll"><svg id="pidSvg" viewBox="0 0 800 480" role="img" aria-label="Schéma P&amp;ID du circuit de climatisation"></svg></div>
+    <figcaption><span data-l="fr">Schéma de principe (P&amp;ID) de la boucle de climatisation automobile. Les points ① à ④ sont les états du fluide repris sur le diagramme de Mollier (section 03) ; leurs pressions suivent les températures choisies dans le calcul de performances.</span><span data-l="en">Flow diagram (P&amp;ID) of the automotive A/C loop. Points ① to ④ are the refrigerant states shown on the Mollier chart (section 03); their pressures follow the temperatures selected in the performance calculation.</span></figcaption>
+  </figure>
   <div class="tablewrap" style="margin-top:30px">
     <table class="min640">
       <thead><tr><th></th><th><span data-l="fr">Fonction</span><span data-l="en">Function</span></th><th><span data-l="fr">Critère · niveau</span><span data-l="en">Criterion · level</span></th></tr></thead>
@@ -567,6 +567,22 @@ footer .wrap{display:grid;gap:12px}
       </tbody>
     </table>
   </div>
+  <div class="cols" style="margin-top:36px">
+    <figure class="card">
+      <div class="fighead"><span class="eyebrow">NF EN 16271</span><span class="figtag" data-l="fr">Diagramme pieuvre</span><span class="figtag" data-l="en">Interaction diagram</span></div>
+      <svg id="octoSvg" viewBox="0 0 660 460" role="img" aria-label="Diagramme pieuvre"></svg>
+      <figcaption><span data-l="fr">Diagramme des interactions (« pieuvre ») : la fonction principale FP1 relie deux éléments du milieu extérieur à travers le produit ; les fonctions contraintes FC1 à FC7 relient le produit à un seul élément.</span><span data-l="en">Interaction (“octopus”) diagram: the main function FP1 links two outside elements through the product; constraint functions FC1 to FC7 link the product to a single element.</span></figcaption>
+    </figure>
+    <div class="stack">
+      <p><span data-l="fr">L’analyse fonctionnelle part du besoin (bête à cornes), recense les éléments extérieurs en contact avec le compresseur (pieuvre), puis décompose la fonction principale en fonctions techniques jusqu’aux pièces qui les réalisent (FAST).</span><span data-l="en">Functional analysis starts from the need (horned beast), lists the outside elements in contact with the compressor (octopus), then breaks the main function down into technical functions down to the parts that perform them (FAST).</span></p>
+      <p class="note"><span data-l="fr">Lecture du FAST : de gauche à droite on répond à « comment ? », de droite à gauche à « pourquoi ? ». Les repères renvoient à la nomenclature de la vue éclatée.</span><span data-l="en">Reading the FAST: left to right answers “how?”, right to left answers “why?”. Item numbers refer to the exploded-view bill of materials.</span></p>
+    </div>
+  </div>
+  <figure class="card fig-wide" style="margin-top:28px">
+    <div class="fighead"><span class="eyebrow">FAST · Function Analysis System Technique</span><span class="figtag" data-l="fr">Fonctions techniques → solutions</span><span class="figtag" data-l="en">Technical functions → solutions</span></div>
+    <div class="figscroll"><svg id="fastSvg" viewBox="0 0 990 820" role="img" aria-label="Diagramme FAST"></svg></div>
+    <figcaption><span data-l="fr">Diagramme FAST de la fonction principale : chaque fonction technique est décomposée jusqu’aux pièces (repères de la nomenclature) qui la réalisent.</span><span data-l="en">FAST diagram of the main function: each technical function is broken down to the parts (bill-of-materials numbers) that perform it.</span></figcaption>
+  </figure>
 </div></section>
 
 <!-- 03 -->
@@ -661,6 +677,11 @@ footer .wrap{display:grid;gap:12px}
     <figure class="card"><svg id="perfChart" class="chart" viewBox="0 0 520 300" role="img" aria-label="Puissances selon la vitesse"></svg>
       <figcaption><span data-l="fr">Puissance frigorifique (bleu) et puissance absorbée sur l’arbre (rouge) en fonction de la vitesse, aux températures choisies.</span><span data-l="en">Cooling capacity (blue) and shaft power (red) against speed, at the selected temperatures.</span></figcaption></figure>
   </div>
+  <figure class="card fig-wide" style="margin-top:28px">
+    <div class="fighead"><span class="eyebrow">R134a · log p – h</span><span class="figtag" data-l="fr">Diagramme de Mollier</span><span class="figtag" data-l="en">Mollier chart</span></div>
+    <div class="figscroll"><svg id="phSvg" viewBox="0 0 820 470" role="img" aria-label="Diagramme de Mollier du R134a"></svg></div>
+    <figcaption><span data-l="fr">Cycle frigorifique tracé sur le diagramme pression – enthalpie du R134a. Il se met à jour avec les températures et le rendement choisis ci-dessus : 1→2 compression, 2→3 condensation, 3→4 détente isenthalpique, 4→1 évaporation. La courbe en pointillés 1→2s est la compression isentropique idéale.</span><span data-l="en">Refrigeration cycle plotted on the R134a pressure–enthalpy chart. It updates with the temperatures and efficiency chosen above: 1→2 compression, 2→3 condensation, 3→4 isenthalpic expansion, 4→1 evaporation. The dotted line 1→2s is the ideal isentropic compression.</span></figcaption>
+  </figure>
   <div class="cols" style="margin-top:28px">
     <figure class="card"><svg id="torqueChart" class="chart" viewBox="0 0 520 240" role="img" aria-label="Couple sur l’arbre sur deux tours"></svg>
       <figcaption><span data-l="fr">Couple sur l’arbre sur deux tours, rapporté au couple moyen : compresseur scroll (orange) et compresseur à un piston (gris).</span><span data-l="en">Shaft torque over two revolutions, relative to mean torque: scroll compressor (orange) and single-piston compressor (grey).</span></figcaption></figure>
@@ -772,49 +793,7 @@ footer .wrap{display:grid;gap:12px}
   <div class="sh"><div class="no">07</div><h2><span data-l="fr">Schéma cinématique</span><span data-l="en">Kinematic diagram</span></h2><div class="other"><span data-l="fr">Kinematic diagram</span><span data-l="en">Schéma cinématique</span></div></div>
   <div class="cols">
     <figure class="svgbox">
-      <svg viewBox="0 0 600 360" role="img" aria-label="Schéma cinématique minimal">
-        <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--ink)" stroke-width="1.4"/></pattern></defs>
-        <line x1="30" y1="200" x2="580" y2="200" class="st-muted" stroke-dasharray="16 4 3 4"/>
-        <!-- S0 bâti -->
-        <g><rect x="250" y="292" width="120" height="12" fill="url(#hatch)"/><line x1="250" y1="292" x2="370" y2="292" class="st-ink" stroke-width="2"/>
-          <path d="M310 292 V236" class="st-ink" stroke-width="2.5"/>
-          <rect x="285" y="186" width="50" height="28" fill="var(--panel)" class="st-ink" stroke-width="2.5"/>
-          <path d="M285 180 H335 M285 220 H335" class="st-ink" stroke-width="2.5"/><path d="M310 220 V236" class="st-ink" stroke-width="2.5"/>
-          <text x="310" y="324" text-anchor="middle" class="fi-ink" font-size="13" font-weight="700" font-family="IBM Plex Mono">S0</text>
-          <text x="345" y="248" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L1</text></g>
-        <!-- S1 arbre -->
-        <path d="M120 200 H520" stroke="var(--accent)" stroke-width="4"/>
-        <path d="M120 200 V150 H150" stroke="var(--accent)" stroke-width="4" fill="none"/>
-        <text x="420" y="190" font-size="13" font-weight="700" fill="var(--accent-ink)" font-family="IBM Plex Mono">S1</text>
-        <text x="100" y="178" font-size="11" class="fi-muted" font-family="IBM Plex Mono">e</text>
-        <path d="M108 200 V150" class="st-muted" stroke-width="1"/><path d="M104 200 h8 M104 150 h8" class="st-muted"/>
-        <!-- L2 pivot excentré -->
-        <rect x="150" y="137" width="40" height="26" fill="var(--panel)" stroke="var(--lp)" stroke-width="2.5"/>
-        <path d="M150 131 H190 M150 169 H190" stroke="var(--lp)" stroke-width="2.5"/>
-        <text x="156" y="126" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L2</text>
-        <!-- S2 volute mobile -->
-        <path d="M60 60 V260 M60 150 H150" stroke="var(--lp)" stroke-width="4" fill="none"/>
-        <text x="40" y="56" font-size="13" font-weight="700" fill="var(--lp)" font-family="IBM Plex Mono">S2</text>
-        <!-- S3 Oldham / billes, L3 L4 glissières -->
-        <rect x="36" y="268" width="48" height="26" fill="var(--panel)" stroke="var(--lp)" stroke-width="2.5"/>
-        <path d="M60 260 V268" stroke="var(--lp)" stroke-width="2.5"/>
-        <path d="M30 294 H90" stroke="#b3924f" stroke-width="4"/>
-        <text x="96" y="286" font-size="12" class="fi-muted" font-family="IBM Plex Mono">L4 (z)</text>
-        <rect x="46" y="306" width="28" height="22" fill="var(--panel)" stroke="#b3924f" stroke-width="2.5"/>
-        <path d="M30 306 V328 M90 306 V328" stroke="#b3924f" stroke-width="2.5"/>
-        <path d="M60 328 V340" class="st-ink" stroke-width="2.5"/><rect x="40" y="340" width="40" height="8" fill="url(#hatch)"/>
-        <text x="96" y="324" font-size="12" class="fi-muted" font-family="IBM Plex Mono">L3 (y)</text>
-        <text x="8" y="300" font-size="13" font-weight="700" fill="#b3924f" font-family="IBM Plex Mono">S3</text>
-        <!-- S4 poulie, L5 pivot, L6 embrayage -->
-        <path d="M455 120 V280" stroke="var(--mid)" stroke-width="4"/>
-        <path d="M455 120 H480 M455 280 H480" stroke="var(--mid)" stroke-width="4"/>
-        <text x="462" y="110" font-size="13" font-weight="700" fill="var(--mid)" font-family="IBM Plex Mono">S4</text>
-        <rect x="430" y="232" width="50" height="24" fill="var(--panel)" stroke="var(--mid)" stroke-width="2.5"/>
-        <path d="M430 226 H480 M430 262 H480" stroke="var(--mid)" stroke-width="2.5"/>
-        <text x="486" y="252" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L5</text>
-        <path d="M500 160 V240 M512 160 V240" stroke-width="5" stroke="var(--accent)"/><path d="M480 200 H500" stroke="var(--mid)" stroke-width="4"/>
-        <text x="520" y="160" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L6</text>
-      </svg>
+      <svg id="kinSvg" viewBox="0 0 680 440" role="img" aria-label="Schéma cinématique minimal normalisé"></svg>
       <figcaption><span data-l="fr">Schéma minimal (vue de côté, axe x horizontal). S2 ne peut que translater grâce aux deux glissières perpendiculaires L3 et L4 : son mouvement par rapport à S0 est une translation circulaire de rayon e.</span><span data-l="en">Minimal diagram (side view, x axis horizontal). S2 can only translate because of the two perpendicular slides L3 and L4: its motion relative to S0 is a circular translation of radius e.</span></figcaption>
     </figure>
     <div class="stack">
@@ -837,6 +816,11 @@ footer .wrap{display:grid;gap:12px}
           <tr><td class="k">L5</td><td class="mono">S4/S0</td><td><span data-l="fr">Pivot d’axe (O, x) : roulement de poulie</span><span data-l="en">Revolute (O, x): pulley bearing</span></td></tr>
           <tr><td class="k">L6</td><td class="mono">S4/S1</td><td><span data-l="fr">Embrayage : encastrement si bobine alimentée, aucune liaison sinon</span><span data-l="en">Clutch: rigid if the coil is powered, no joint otherwise</span></td></tr>
         </tbody></table></div>
+      <figure class="card">
+        <div class="fighead"><span class="eyebrow">ISO 3952</span><span class="figtag" data-l="fr">Graphe des liaisons</span><span class="figtag" data-l="en">Joint graph</span></div>
+        <svg id="graphSvg" viewBox="0 0 520 380" role="img" aria-label="Graphe des liaisons"></svg>
+        <figcaption><span data-l="fr">Graphe des liaisons : 5 classes d’équivalence, 6 liaisons. Nombre cyclomatique γ = L − N + 1 = 2 boucles indépendantes. L6 (embrayage) n’existe que bobine alimentée.</span><span data-l="en">Joint graph: 5 rigid groups, 6 joints. Cyclomatic number γ = L − N + 1 = 2 independent loops. L6 (clutch) only exists when the coil is powered.</span></figcaption>
+      </figure>
     </div>
   </div>
 </div></section>
@@ -1006,6 +990,7 @@ footer .wrap{display:grid;gap:12px}
       <tr><td class="k">B</td><td><span data-l="fr">Montage animé en 3D, repères, diagramme P‑V, coupe de l’embrayage</span><span data-l="en">3D animated assembly, balloons, P‑V diagram, clutch section</span></td></tr>
       <tr><td class="k">C</td><td><span data-l="fr">Géométrie cotée, calcul des performances, fiche technique</span><span data-l="en">Dimensioned geometry, performance calculation, data sheet</span></td></tr>
       <tr><td class="k">D</td><td><span data-l="fr">Refonte futuriste : interface HUD, 3D néon, mode hologramme, télémétrie, nomenclature des matériaux</span><span data-l="en">Futuristic redesign: HUD interface, neon 3D, hologram mode, telemetry, materials list</span></td></tr>
+      <tr><td class="k">E</td><td><span data-l="fr">Figures d’ingénierie : P&amp;ID du circuit, diagramme de Mollier, pieuvre, FAST, schéma cinématique ISO, graphe des liaisons</span><span data-l="en">Engineering figures: circuit P&amp;ID, Mollier chart, octopus diagram, FAST, ISO kinematic diagram, joint graph</span></td></tr>
     </tbody></table></div>
   <p><b><span data-l="fr">Dossier technique SAÉ 1.1 · Analyse d’un produit grand public · BUT GMP 1</span><span data-l="en">SAÉ 1.1 technical file · Consumer product analysis · BUT GMP year 1</span></b></p>
   <p><span data-l="fr">Sources : sujet de la SAÉ 1.1 et présentation de lancement ; CM en anglais « The functioning of a scroll compressor » et son corrigé ; fichiers CATIA du compresseur (nomenclature et éclaté linéaire) ; photo du compresseur du TP ; bases de données CES Selector et matweb.com. Modèle 3D, animations et vidéo réalisés en code ; formes simplifiées, non à l’échelle exacte.</span><span data-l="en">Sources: SAÉ 1.1 brief and kick-off slides; English lecture “The functioning of a scroll compressor” and its answer key; CATIA files of the compressor (bill of materials and linear exploded view); photo of the lab compressor; CES Selector and matweb.com databases. 3D model, animations and video made in code; simplified shapes, not to exact scale.</span></p>
@@ -1828,7 +1813,7 @@ function engAll(){ const G = geomCalc(), n = +nRpm.value, eta = Math.min(0.95, M
   setAll('js-vs', fmt(G.Vs, 1)); setAll('js-vi', fmt(G.Vi, 2)); setAll('js-e', fmt(G.e * 10, 2)); setAll('js-pth', `${fmt(G.p * 10, 1)} · ${fmt(G.t * 10, 1)} · ${fmt(G.h * 10, 0)} mm`);
   setAll('js-q', fmt(N0.Q, 2)); setAll('js-p', fmt(N0.P, 2)); setAll('js-cop', fmt(N0.cop, 2)); setAll('js-m', fmt(N0.m * 1000, 1)); setAll('js-t', fmt(N0.T, 1));
   setAll('js-r', fmt(CLUTCH.R, 2)); setAll('js-pw', fmt(CLUTCH.P, 1)); setAll('js-ct', fmt(CLUTCH.C, 1)); setAll('js-sf', fmt(CLUTCH.C / N0.T, 1));
-  perfChart(G, n, eta); }
+  perfChart(G, n, eta); figCycle(); }
 function perfChart(G, n, eta){ const svg = document.getElementById('perfChart'), W = 520, H = 300, L = 46, R = 20, Tp = 22, B = 40;
   const pts = []; for (let x = 800; x <= 6000; x += 100) pts.push([x, perfCalc(G, x, tEv.value, tCd.value, eta)]);
   const ym = Math.max(1, Math.ceil(Math.max(...pts.map(p => p[1].Q)) * 1.15)); const X = x => L + (x - 0) / 6000 * (W - L - R), Y = y => H - B - y / ym * (H - Tp - B);
@@ -1910,6 +1895,198 @@ listeners.push(renderQuiz);
 const LEX = [['Compresseur à spirales','Scroll (spiral) compressor'],['Volute fixe','Fixed (stationary) scroll'],['Volute mobile','Orbiting scroll'],['Chambre de compression','Compression chamber'],['Chambre d’aspiration','Suction chamber'],['Orifice d’aspiration','Suction port'],['Orifice de refoulement','Discharge port'],['Clapet anti-retour','Non-return valve'],['Capteur de température','Fail-safe temperature sensor'],['Translation circulaire','Circular translation'],['Fluide frigorigène','Refrigerant'],['Condenseur / évaporateur','Condenser / evaporator'],['Détendeur','Expansion valve'],['Poulie à gorges','Grooved pulley'],['Embrayage électromagnétique','Electromagnetic clutch'],['Bobine','Coil'],['Entrefer','Air gap'],['Roulement','Bearing'],['Joint torique','O-ring'],['Joint à lèvre','Lip seal'],['Arbre excentrique','Eccentric shaft'],['Contrepoids','Counterweight'],['Circlips','Circlip (retaining ring)'],['Vis / écrou / rondelle','Screw / nut / washer'],['Moulage sous pression','Die casting'],['Usinage','Machining'],['Masse volumique','Density'],['Couple','Torque'],['Rendement','Efficiency'],['Vue éclatée','Exploded view']];
 document.getElementById('lex').innerHTML = LEX.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
 
+/* ---------- figures d'ingénierie (P&ID, Mollier, pieuvre, FAST, cinématique, graphe) ---------- */
+const XE = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const LL = (fr, en) => LANG === 'fr' ? fr : en;
+const tt = (x, y, s, c, a, st) => `<text x="${x}" y="${y}" class="${c || 't-m'}"${a ? ` text-anchor="${a}"` : ''}${st ? ` style="${st}"` : ''}>${XE(s)}</text>`;
+const ttm = (x, y, lines, c, a, lh, st) => `<text x="${x}" y="${y}" class="${c}"${a ? ` text-anchor="${a}"` : ''}${st ? ` style="${st}"` : ''}>${lines.map((l, i) => `<tspan x="${x}" dy="${i ? lh : 0}">${XE(l)}</tspan>`).join('')}</text>`;
+function wrapL(s, n){ const out = []; let cur = ''; s.split(' ').forEach(w => { if ((cur + ' ' + w).trim().length > n && cur) { out.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }); if (cur) out.push(cur); return out; }
+const arw = (x, y, ang, col, sz) => `<path d="M${-(sz || 7)} ${-(sz || 7) * .7}L${sz || 7} 0L${-(sz || 7)} ${(sz || 7) * .7}Z" transform="translate(${x} ${y}) rotate(${ang})" fill="${col}"/>`;
+const pill = (x, y, s, col, txtCol) => { const w = s.length * 7.2 + 14; return `<rect x="${x - w / 2}" y="${y - 10}" width="${w}" height="20" rx="3" fill="rgba(2,8,14,.95)" stroke="${col}"/>${tt(x, y + 4, s, 't-tag', 'middle', `fill:${txtCol || col}`)}`; };
+
+// R134a à saturation : T °C, p bar abs, h liquide, h vapeur (kJ/kg, référence ASHRAE)
+const SAT = [[-40, 0.512, 148.1, 374.0], [-30, 0.844, 160.0, 380.3], [-20, 1.327, 173.6, 386.6], [-10, 2.006, 186.7, 392.7], [0, 2.928, 200.0, 398.6], [10, 4.146, 213.6, 404.3], [20, 5.717, 227.5, 409.7], [30, 7.702, 241.7, 414.8], [40, 10.17, 256.4, 419.4], [50, 13.18, 271.6, 423.4], [60, 16.82, 287.5, 426.6], [70, 21.17, 304.3, 428.6], [80, 26.33, 322.4, 428.8], [90, 32.44, 342.9, 425.6], [100, 39.72, 373.2, 407.5]];
+const CRIT = [389.6, 40.59];
+function satAt(T){ for (let i = 0; i < SAT.length - 1; i++) { const a = SAT[i], b = SAT[i + 1]; if (T >= a[0] && T <= b[0]) { const k = (T - a[0]) / (b[0] - a[0]); return a.map((v, j) => v + (b[j] - v) * k); } } return SAT[0]; }
+const COLS = { hpg: '#ff3d6e', hpl: '#ff9f43', lpm: '#8fd3ff', lpg: '#3a8bff', sig: '#b45cff' };
+
+/* P&ID */
+function drawPID(Te, Tc){ const svg = document.getElementById('pidSvg'); if (!svg) return; const e = satAt(+Te), c = satAt(+Tc);
+  const pf = v => fmt(v, v < 10 ? 2 : 1);
+  const pipe = (d, col, dash) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="5" stroke-linejoin="round" opacity=".38"/><path d="${d}" fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round"${dash ? ' stroke-dasharray="7 5"' : ''} class="glow" style="color:${col}"/><path d="${d}" class="flow" stroke="${col}" style="color:${col};stroke-width:3;opacity:.9"/>`;
+  let s = '';
+  for (let x = 0; x <= 800; x += 40) s += `<line class="grid" x1="${x}" y1="0" x2="${x}" y2="480"/>`; for (let y = 0; y <= 480; y += 40) s += `<line class="grid" x1="0" y1="${y}" x2="800" y2="${y}"/>`;
+  // tuyauteries
+  s += pipe('M180 214V92H300', COLS.hpg) + pipe('M520 92H640V140', COLS.hpl) + pipe('M640 200V246', COLS.hpl) + pipe('M640 278V380H520', COLS.lpm, 1) + pipe('M300 380H180V286', COLS.lpg);
+  s += arw(180, 175, -90, COLS.hpg) + arw(245, 92, 0, COLS.hpg) + arw(590, 92, 0, COLS.hpl) + arw(640, 226, 90, COLS.hpl) + arw(640, 345, 90, COLS.lpm) + arw(580, 380, 180, COLS.lpm) + arw(275, 380, 180, COLS.lpg) + arw(180, 352, -90, COLS.lpg);
+  // condenseur E-01
+  s += `<rect class="box" x="300" y="64" width="220" height="56"/>`; let z = 'M310 92'; for (let x = 320; x <= 510; x += 10) z += `L${x} ${x % 20 ? 76 : 108}`; s += `<path d="${z}L510 92" fill="none" stroke="${COLS.hpg}" stroke-width="1.4"/>`;
+  s += tt(410, 138, LL('E-01 · CONDENSEUR', 'E-01 · CONDENSER'), 't-b t-disp', 'middle');
+  [340, 410, 480].forEach(x => s += `<line x1="${x}" y1="18" x2="${x}" y2="52" stroke="var(--muted)" stroke-width="1.4"/>` + arw(x, 54, 90, 'var(--muted)', 5));
+  s += tt(536, 30, LL('air extérieur → réchauffé', 'outside air → heated'), 't-s');
+  // déshydrateur R-01
+  s += `<rect x="626" y="140" width="28" height="60" rx="13" class="box acc"/><line x1="630" y1="170" x2="650" y2="170" stroke="var(--accent)" stroke-dasharray="2 3"/>`;
+  s += tt(616, 166, 'R-01', 't-tag', 'end') + tt(616, 180, LL('déshydrateur', 'receiver-drier'), 't-s', 'end');
+  // détendeur V-01 (thermostatique)
+  s += `<path d="M626 246H654L640 262ZM626 278H654L640 262Z" fill="rgba(255,159,67,.25)" stroke="${COLS.hpl}" stroke-width="1.6"/><path d="M640 262H660" stroke="var(--ink)"/><rect x="660" y="254" width="16" height="16" class="box"/>`;
+  s += tt(616, 258, 'V-01', 't-tag', 'end') + tt(616, 272, LL('détendeur thermostatique', 'thermostatic exp. valve'), 't-s', 'end');
+  // évaporateur E-02
+  s += `<rect class="box" x="300" y="352" width="220" height="56"/>`; z = 'M310 380'; for (let x = 320; x <= 510; x += 10) z += `L${x} ${x % 20 ? 364 : 396}`; s += `<path d="${z}L510 380" fill="none" stroke="${COLS.lpm}" stroke-width="1.4"/>`;
+  s += tt(410, 344, LL('E-02 · ÉVAPORATEUR', 'E-02 · EVAPORATOR'), 't-b t-disp', 'middle');
+  [340, 410, 480].forEach(x => s += `<line x1="${x}" y1="414" x2="${x}" y2="440" stroke="${COLS.lpg}" stroke-width="1.4"/>` + arw(x, 442, 90, COLS.lpg, 5));
+  s += tt(500, 458, LL('air soufflé habitacle ≈ 5 °C', 'cabin supply air ≈ 5 °C'), 't-s', 'end', `fill:${COLS.lpm}`);
+  // bulbe et capillaire du détendeur
+  s += `<rect x="244" y="385" width="14" height="8" fill="${COLS.hpl}"/><path d="M251 393V468H700V262H676" fill="none" stroke="${COLS.hpl}" stroke-width="1" stroke-dasharray="3 3"/>`;
+  s += tt(262, 402, LL('bulbe', 'bulb'), 't-s');
+  // compresseur C-01 + embrayage + moteur
+  s += `<circle cx="180" cy="250" r="36" class="box acc" style="filter:drop-shadow(0 0 8px rgba(34,240,255,.5))"/><path d="M152 272L180 216L208 272" fill="none" stroke="var(--accent)" stroke-width="1.8"/>`;
+  s += tt(180, 304, 'C-01', 't-tag', 'middle') + tt(180, 318, LL('compresseur scroll', 'scroll compressor'), 't-s', 'middle');
+  s += `<circle cx="104" cy="250" r="15" fill="none" stroke="${COLS.sig}" stroke-width="1.6"/><line x1="124" y1="234" x2="124" y2="266" stroke="${COLS.sig}" stroke-width="3"/><line x1="131" y1="234" x2="131" y2="266" stroke="var(--accent)" stroke-width="3"/><line x1="131" y1="250" x2="144" y2="250" stroke="var(--accent)" stroke-width="2"/>`;
+  s += `<path d="M112 222l4 -6l4 6l4 -6l4 6l4 -6" fill="none" stroke="${COLS.sig}" stroke-width="1.4"/>` + tt(122, 210, 'EM-01 · 12 V', 't-s', 'middle', `fill:${COLS.sig}`);
+  s += `<circle cx="34" cy="250" r="18" fill="none" stroke="var(--muted)" stroke-width="1.6"/><path d="M34 232L104 235M34 268L104 265" stroke="var(--muted)" stroke-width="1.4"/>` + tt(34, 254, 'M', 't-b', 'middle') + tt(34, 290, LL('moteur', 'engine'), 't-s', 'middle');
+  // instrumentation
+  s += `<line x1="560" y1="66" x2="560" y2="92" stroke="var(--ink)"/><circle cx="560" cy="52" r="14" class="box" style="stroke:var(--ink)"/>` + tt(560, 56, 'PT', 't-tag', 'middle', 'fill:#fff');
+  s += `<line x1="222" y1="214" x2="207" y2="226" stroke="var(--ink)"/><circle cx="232" cy="204" r="14" class="box" style="stroke:var(--ink)"/>` + tt(232, 208, 'TT', 't-tag', 'middle', 'fill:#fff');
+  s += `<path d="M246 204H286V176H560V66" fill="none" stroke="${COLS.sig}" stroke-dasharray="2 4"/>` + tt(300, 192, LL('signaux → calculateur clim (ECU)', 'signals → A/C control unit (ECU)'), 't-s', '', `fill:${COLS.sig}`);
+  // points d'état
+  const st = (x, y, n, l1, l2, col, lx, anchor) => `<circle cx="${x}" cy="${y}" r="10" fill="rgba(2,8,14,.95)" stroke="${col}" stroke-width="1.6"/>${tt(x, y + 4, n, 't-tag', 'middle', `fill:${col}`)}${tt(lx, y - 2, l1, 't-m', anchor, 'fill:#fff')}${tt(lx, y + 12, l2, 't-s', anchor)}`;
+  s += st(180, 336, '1', `${pf(e[1])} bar · ${fmt(e[0], 0)} °C`, LL('vapeur saturée', 'saturated vapour'), COLS.lpg, 196);
+  s += st(180, 120, '2', `${pf(c[1])} bar`, LL('vapeur surchauffée', 'superheated vapour'), COLS.hpg, 196);
+  s += st(640, 118, '3', `${pf(c[1])} bar · ${fmt(c[0], 0)} °C`, LL('liquide saturé', 'saturated liquid'), COLS.hpl, 658);
+  s += st(640, 320, '4', `${pf(e[1])} bar · ${fmt(e[0], 0)} °C`, LL('mélange liq. + vap.', 'liquid + vapour'), COLS.lpm, 658);
+  // légende
+  const lg = [[COLS.hpg, LL('HP gaz', 'HP gas')], [COLS.hpl, LL('HP liquide', 'HP liquid')], [COLS.lpm, LL('BP mélange', 'LP two-phase')], [COLS.lpg, LL('BP gaz', 'LP gas')], [COLS.sig, LL('signal élec.', 'elec. signal')]];
+  s += `<rect class="box" x="10" y="338" width="150" height="${lg.length * 20 + 20}"/>` + lg.map((l, i) => `<line x1="22" y1="${358 + i * 20}" x2="46" y2="${358 + i * 20}" stroke="${l[0]}" stroke-width="3"${i === 4 ? ' stroke-dasharray="2 3"' : ''}/>${tt(54, 362 + i * 20, l[1], 't-s', '', 'fill:var(--ink)')}`).join('');
+  svg.innerHTML = s; svg.classList.add('eng'); }
+
+/* Diagramme de Mollier */
+function drawPH(Te, Tc, eta){ const svg = document.getElementById('phSvg'); if (!svg) return;
+  const W = 820, H = 470, L = 66, R = 24, T = 34, B = 52, h0 = 140, h1 = 480, q0 = Math.log10(0.6), q1 = Math.log10(50);
+  const X = h => L + (h - h0) / (h1 - h0) * (W - L - R), Y = p => H - B - (Math.log10(p) - q0) / (q1 - q0) * (H - T - B);
+  let s = `<defs><linearGradient id="domeG" x1="0" x2="1"><stop offset="0" stop-color="#3a8bff" stop-opacity=".2"/><stop offset="1" stop-color="#ff3d6e" stop-opacity=".14"/></linearGradient></defs>`;
+  [0.6, 1, 2, 3, 5, 10, 20, 30, 50].forEach(p => s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${Y(p)}" y2="${Y(p)}"/>${tt(L - 8, Y(p) + 4, fmt(p, p < 1 ? 1 : 0), 't-s', 'end')}`);
+  for (let h = 150; h <= 475; h += 25) s += `<line class="grid" x1="${X(h)}" x2="${X(h)}" y1="${T}" y2="${H - B}"/>` + (h % 50 === 0 ? tt(X(h), H - B + 18, h, 't-s', 'middle') : '');
+  s += `<line class="axis" x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}"/><line class="axis" x1="${L}" y1="${T}" x2="${L}" y2="${H - B}"/>`;
+  s += tt(W - R, H - 12, LL('h — enthalpie massique (kJ/kg)', 'h — specific enthalpy (kJ/kg)'), 't-s', 'end') + tt(L - 8, T - 14, LL('p (bar abs) — échelle log', 'p (bar abs) — log scale'), 't-s', 'start');
+  const liq = SAT.map(r => [r[2], r[1]]), vap = SAT.map(r => [r[3], r[1]]).reverse();
+  const P = pts => pts.map((q, i) => (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1)).join('');
+  s += `<clipPath id="phClip"><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}"/></clipPath><g clip-path="url(#phClip)"><path d="${P(liq.concat([CRIT], vap))}Z" fill="url(#domeG)"/><path d="${P(liq.concat([CRIT], vap))}" fill="none" stroke="#e6f6ff" stroke-width="1.8" class="glow" style="color:rgba(34,240,255,.6)"/></g>`;
+  [0.2, 0.4, 0.6, 0.8].forEach(x => { const pts = SAT.slice(0, -1).map(r => [r[2] + x * (r[3] - r[2]), r[1]]); s += `<path d="${P(pts)}" fill="none" stroke="rgba(230,246,255,.25)" stroke-dasharray="3 4"/>${tt(X(pts[0][0]), Y(pts[0][1]) + 14, 'x=' + x, 't-s', 'middle')}`; });
+  [-20, 0, 20, 40, 60, 80].forEach(t => { if (t === +Te || t === +Tc) return; const r = satAt(t); s += `<line x1="${X(r[2])}" x2="${X(r[3])}" y1="${Y(r[1])}" y2="${Y(r[1])}" stroke="rgba(230,246,255,.12)"/>${tt(X(r[2]) + 8, Y(r[1]) - 4, t + ' °C', 't-s', '', 'fill:rgba(230,246,255,.45)')}`; });
+  s += tt(X(168), Y(18), LL('LIQUIDE', 'LIQUID'), 't-s t-disp', 'middle', 'fill:#8fd3ff;font-size:12px') + tt(X(300), Y(4.2), LL('MÉLANGE', 'TWO-PHASE'), 't-s t-disp', 'middle', 'fill:#cfe9ff;font-size:12px') + tt(X(452), Y(5.5), LL('VAPEUR', 'VAPOUR'), 't-s t-disp', 'middle', 'fill:#ffb3c6;font-size:12px');
+  s += `<circle cx="${X(CRIT[0])}" cy="${Y(CRIT[1])}" r="3.5" fill="#fff"/>` + tt(X(CRIT[0]) + 8, Y(CRIT[1]) - 6, LL('point critique 101 °C', 'critical point 101 °C'), 't-s');
+  // cycle
+  const e = satAt(+Te), c = satAt(+Tc), p1 = e[1], p2 = c[1], rho = (R134.ev[Te] || [0, 14.4])[1];
+  const ws = K / (K - 1) * p1 * 1e5 / rho * ((p2 / p1) ** ((K - 1) / K) - 1) / 1000, hA = e[3], hB = hA + ws / eta, hBs = hA + ws, hC = c[2];
+  const comp = (h2) => { const pts = []; for (let i = 0; i <= 24; i++) { const k = i / 24, p = p1 * (p2 / p1) ** k; pts.push([hA + (h2 - hA) * ((p / p1) ** ((K - 1) / K) - 1) / ((p2 / p1) ** ((K - 1) / K) - 1), p]); } return pts; };
+  s += `<path d="${P(comp(hBs))}" fill="none" stroke="var(--muted)" stroke-width="1.4" stroke-dasharray="4 4"/>`;
+  s += `<path d="${P([[hC, p1], [hA, p1]])}" stroke="${COLS.lpg}" stroke-width="3.5" class="glow" style="color:${COLS.lpg}"/>`;
+  s += `<path d="${P(comp(hB))}" fill="none" stroke="var(--accent2)" stroke-width="3.5" class="glow" style="color:var(--accent2)"/>`;
+  s += `<path d="${P([[hB, p2], [hC, p2]])}" stroke="${COLS.hpg}" stroke-width="3.5" class="glow" style="color:${COLS.hpg}"/>`;
+  s += `<path d="${P([[hC, p2], [hC, p1]])}" stroke="${COLS.hpl}" stroke-width="3" stroke-dasharray="6 4"/>`;
+  s += arw((X(hC) + X(hA)) / 2, Y(p1), 0, COLS.lpg, 6) + arw((X(hB) + X(hC)) / 2, Y(p2), 180, COLS.hpg, 6) + arw(X(hC), (Y(p1) + Y(p2)) / 2, 90, COLS.hpl, 6);
+  const pt = (h, p, n, col, dx, dy) => `<circle cx="${X(h)}" cy="${Y(p)}" r="9" fill="rgba(2,8,14,.95)" stroke="${col}" stroke-width="2"/>${tt(X(h), Y(p) + 4, n, 't-tag', 'middle', `fill:${col}`)}`;
+  s += pt(hA, p1, '1', COLS.lpg) + pt(hB, p2, '2', 'var(--accent2)') + pt(hC, p2, '3', COLS.hpl) + pt(hC, p1, '4', COLS.lpm) + `<circle cx="${X(hBs)}" cy="${Y(p2)}" r="4" fill="var(--muted)"/>` + tt(X(hBs), Y(p2) - 10, '2s', 't-s', 'middle');
+  // cotes d'énergie
+  const brk = (ha, hb, y, lab, col) => `<line x1="${X(ha)}" x2="${X(hb)}" y1="${y}" y2="${y}" stroke="${col}" stroke-width="1"/><line x1="${X(ha)}" x2="${X(ha)}" y1="${y - 5}" y2="${y + 5}" stroke="${col}"/><line x1="${X(hb)}" x2="${X(hb)}" y1="${y - 5}" y2="${y + 5}" stroke="${col}"/>${tt((X(ha) + X(hb)) / 2, y - 6, lab, 't-tag', 'middle', `fill:${col}`)}`;
+  s += brk(hC, hA, Y(p1) + 26, `q₀ = ${fmt(hA - hC, 0)} kJ/kg`, COLS.lpg) + brk(hA, hB, Y(p2) - 22, `w = ${fmt(hB - hA, 1)} kJ/kg`, 'var(--accent2)') + brk(hC, hB, Y(p2) - 48, `q_c = ${fmt(hB - hC, 0)} kJ/kg`, COLS.hpg);
+  s += tt(X(hC) - 14, Y(p1) + 4, `Tₑ ${fmt(e[0], 0)} °C · ${fmt(p1, 2)} bar`, 't-s', 'end', `fill:${COLS.lpm}`) + tt(X(hC) - 14, Y(p2) + 4, `T_c ${fmt(c[0], 0)} °C · ${fmt(p2, 1)} bar`, 't-s', 'end', `fill:${COLS.hpl}`);
+  const bx = W - R - 196, by = H - B - 84; s += `<rect class="box acc" x="${bx}" y="${by}" width="190" height="72"/>` + tt(bx + 12, by + 22, 'COP = q₀ / w', 't-s') + tt(bx + 12, by + 50, fmt((hA - hC) / (hB - hA), 2), 't-b', '', 'font-size:26px;fill:var(--accent)') + tt(bx + 178, by + 50, `η_is ${fmt(eta, 2)}`, 't-s', 'end');
+  svg.innerHTML = s; svg.classList.add('eng'); }
+
+/* Diagramme pieuvre */
+function drawOcto(){ const svg = document.getElementById('octoSvg'); if (!svg) return; const cx = 330, cy = 225;
+  const E = { mot: [86, 225, LL('Moteur thermique', 'Engine'), LL('(courroie)', '(belt)')], flu: [574, 225, LL('Fluide R134a', 'R134a refrigerant'), LL('+ huile PAG', '+ PAG oil')], ecu: [150, 66, LL('Calculateur', 'A/C control'), LL('de clim', 'unit')], pas: [510, 66, LL('Passagers', 'Passengers'), LL('(bruit)', '(noise)')], blo: [150, 390, LL('Bloc moteur', 'Engine block'), LL('(fixation)', '(mounting)')], env: [510, 390, LL('Environnement', 'Under-bonnet'), LL('sous capot', 'environment')] };
+  let s = ''; for (let a = 0; a < 6; a++) s += `<circle cx="${cx}" cy="${cy}" r="${70 + a * 34}" fill="none" stroke="rgba(34,240,255,${0.06 - a * 0.008})"/>`;
+  const fc = (k, n, dy, f) => { const [x, y] = E[k], x0 = cx, y0 = cy + (dy || 0), x1 = x, y1 = y + (dy || 0), mx = x0 + (x1 - x0) * (f || 0.62), my = y0 + (y1 - y0) * (f || 0.62); return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="var(--accent)" stroke-width="1.6" opacity=".85"/>${pill(mx, my, n, 'var(--accent)')}`; };
+  s += fc('mot', 'FC1', 24, 0.5) + fc('ecu', 'FC2') + fc('flu', 'FC3', -20, 0.5) + fc('flu', 'FC4', 22, 0.5) + fc('blo', 'FC5') + fc('env', 'FC6') + fc('pas', 'FC7');
+  s += `<path d="M150 214 Q ${cx} 130 512 214" fill="none" stroke="var(--accent2)" stroke-width="3" class="glow" style="color:var(--accent2)"/>` + pill(cx, 168, 'FP1', 'var(--accent2)', '#fff');
+  s += `<ellipse cx="${cx}" cy="${cy}" rx="96" ry="44" fill="rgba(34,240,255,.14)" stroke="var(--accent)" stroke-width="2" class="glow" style="color:var(--accent)"/>` + tt(cx, cy - 2, LL('COMPRESSEUR', 'SCROLL'), 't-b t-disp', 'middle', 'font-size:15px') + tt(cx, cy + 16, LL('SCROLL', 'COMPRESSOR'), 't-b t-disp', 'middle', 'font-size:15px;fill:var(--accent)');
+  for (const k in E) { const [x, y, a, b] = E[k]; s += `<rect class="box" x="${x - 68}" y="${y - 24}" width="136" height="48" rx="24" style="stroke:var(--line2)"/>${tt(x, y - 3, a, 't-m', 'middle', 'fill:#fff;font-weight:600')}${tt(x, y + 13, b, 't-s', 'middle')}`; }
+  s += tt(cx, 448, LL('FP : relie deux éléments à travers le produit · FC : adapte le produit à un élément', 'FP: links two elements through the product · FC: adapts the product to one element'), 't-s', 'middle');
+  svg.innerHTML = s; svg.classList.add('eng'); }
+
+/* Diagramme FAST */
+const FAST = { fp: ['Comprimer et faire circuler le fluide frigorigène', 'Compress and circulate the refrigerant'], ft: [
+  { c: 'FT1', t: ['Recevoir l’énergie mécanique du moteur', 'Take mechanical power from the engine'], k: [
+    { c: 'FT11', t: ['Transmettre le couple de la courroie', 'Transmit the belt torque'], p: ['poulie', 'roulement3552'] },
+    { c: 'FT12', t: ['Accoupler ou désaccoupler sur commande', 'Engage or disengage on command'], p: ['electro', 'embrayage', 'rondelle'] }] },
+  { c: 'FT2', t: ['Créer le mouvement de translation circulaire', 'Create the circular translation'], k: [
+    { c: 'FT21', t: ['Décaler l’axe de la volute mobile de e', 'Offset the orbiting scroll axis by e'], p: ['axe', 'masselotte', 'roulementExc'] },
+    { c: 'FT22', t: ['Empêcher la rotation propre', 'Prevent self-rotation'], p: ['billes', 'rondGuide', 'feuilleVM', 'feuilleVF'] },
+    { c: 'FT23', t: ['Équilibrer les masses tournantes', 'Balance the rotating masses'], p: ['masseInertie'] }] },
+  { c: 'FT3', t: ['Comprimer le gaz', 'Compress the gas'], k: [
+    { c: 'FT31', t: ['Former des poches de volume décroissant', 'Form pockets of shrinking volume'], p: ['voluteFixe', 'voluteMobile'] },
+    { c: 'FT32', t: ['Refouler sans retour du gaz', 'Discharge without backflow'], p: ['clapetSouple', 'clapetRigide'] }] },
+  { c: 'FT4', t: ['Guider l’arbre en rotation', 'Guide the shaft in rotation'], p: ['roulement3547', 'roulement1228'] },
+  { c: 'FT5', t: ['Assurer l’étanchéité du circuit', 'Keep the circuit sealed'], p: ['jointSPI', 'grandJoint', 'jointCouvercle', 'jointMetal'] },
+  { c: 'FT6', t: ['Protéger contre la surchauffe', 'Protect against overheating'], p: ['capteur'] }] };
+function drawFast(){ const svg = document.getElementById('fastSvg'); if (!svg) return; const li = LANG === 'fr' ? 0 : 1;
+  const C = { fp: [10, 170], ft: [210, 200], sf: [440, 200], so: [672, 300] }; let y = 74, s = '', links = '';
+  const fbox = (x, w, yc, code, txt, cls) => { const lines = wrapL(txt, Math.floor(w / 7.1)), h = lines.length * 15 + 26; return { h, svg: `<rect class="box ${cls || ''}" x="${x}" y="${yc - h / 2}" width="${w}" height="${h}"/>${tt(x + 8, yc - h / 2 + 13, code, 't-tag', '', cls === 'fp' ? 'fill:var(--accent2)' : '')}${ttm(x + 8, yc - h / 2 + 29, lines, 't-m', '', 15, 'fill:#fff')}` }; };
+  const sol = (yc, ids) => { const h = ids.length * 17 + 14, x = C.so[0]; return { h, svg: `<rect class="box acc" x="${x}" y="${yc - h / 2}" width="${C.so[1]}" height="${h}"/>` + ids.map((id, i) => `${tt(x + 10, yc - h / 2 + 21 + i * 17, String(SC.REP[id]).padStart(2, '0'), 't-tag')}${tt(x + 36, yc - h / 2 + 21 + i * 17, T(SC.partById[id].name), 't-m', '', 'fill:#e6f6ff')}`).join('') }; };
+  const bus = (x0, y0, x1, ys) => { const xm = (x0 + x1) / 2; let d = ys.map(yy => `M${xm} ${yy}H${x1}`).join(''); d += `M${x0} ${y0}H${xm}M${xm} ${Math.min(y0, ...ys)}V${Math.max(y0, ...ys)}`; return `<path d="${d}" fill="none" stroke="var(--accent)" stroke-width="1.3" opacity=".8"/>` + ys.map(yy => `<circle cx="${x1}" cy="${yy}" r="2.5" fill="var(--accent)"/>`).join(''); };
+  const ftY = [];
+  FAST.ft.forEach(ft => { if (ft.k) { const ys = []; ft.k.forEach(sf => { const so = sol(0, sf.p), fb = fbox(C.sf[0], C.sf[1], 0, sf.c, sf.t[li]), h = Math.max(so.h, fb.h); const yc = y + h / 2; ys.push(yc);
+        s += fbox(C.sf[0], C.sf[1], yc, sf.c, sf.t[li]).svg + sol(yc, sf.p).svg; links += bus(C.sf[0] + C.sf[1], yc, C.so[0], [yc]); y += h + 14; });
+      const yc = (ys[0] + ys[ys.length - 1]) / 2; ftY.push(yc); s += fbox(C.ft[0], C.ft[1], yc, ft.c, ft.t[li]).svg; links += bus(C.ft[0] + C.ft[1], yc, C.sf[0], ys); y += 10; }
+    else { const so = sol(0, ft.p), fb = fbox(C.ft[0], C.ft[1], 0, ft.c, ft.t[li]), h = Math.max(so.h, fb.h), yc = y + h / 2; ftY.push(yc); s += fbox(C.ft[0], C.ft[1], yc, ft.c, ft.t[li]).svg + sol(yc, ft.p).svg;
+      links += `<path d="M${C.ft[0] + C.ft[1]} ${yc}H${C.so[0]}" stroke="var(--accent)" stroke-width="1.3" opacity=".8" stroke-dasharray="1 0"/><circle cx="${C.so[0]}" cy="${yc}" r="2.5" fill="var(--accent)"/>`; y += h + 24; } });
+  const fpY = (ftY[0] + ftY[ftY.length - 1]) / 2; s += fbox(C.fp[0], C.fp[1], fpY, 'FP1', FAST.fp[li], 'fp').svg; links += bus(C.fp[0] + C.fp[1], fpY, C.ft[0], ftY);
+  const H = y + 10; let hd = '';
+  [[C.fp, LL('Fonction principale', 'Main function')], [C.ft, LL('Fonctions techniques', 'Technical functions')], [C.sf, LL('Sous-fonctions', 'Sub-functions')], [C.so, LL('Solutions (rep.)', 'Solutions (item)')]].forEach(([c, l]) => hd += tt(c[0], 22, l.toUpperCase(), 't-s t-disp', '', 'fill:var(--accent);font-size:11px'));
+  hd += `<line x1="10" x2="980" y1="34" y2="34" stroke="var(--line2)"/>` + tt(495, 54, LL('◀ POURQUOI ?            COMMENT ? ▶', '◀ WHY?            HOW? ▶'), 't-s', 'middle', 'fill:var(--accent2);letter-spacing:.2em');
+  svg.setAttribute('viewBox', `0 0 990 ${H}`); svg.innerHTML = hd + links + s; svg.classList.add('eng'); }
+
+/* Schéma cinématique minimal (ISO 3952) */
+const KC = { s0: 'var(--muted)', s1: 'var(--accent)', s2: '#3a8bff', s3: '#ffb547', s4: '#b45cff' };
+function drawKin(){ const svg = document.getElementById('kinSvg'); if (!svg) return; const ay = 236;
+  const gnd = (x, y, w) => `<line x1="${x - w / 2}" y1="${y}" x2="${x + w / 2}" y2="${y}" stroke="var(--ink)" stroke-width="2"/>` + Array.from({ length: Math.floor(w / 8) }, (_, i) => `<line x1="${x - w / 2 + 4 + i * 8}" y1="${y}" x2="${x - w / 2 - 4 + i * 8}" y2="${y + 9}" stroke="var(--muted)" stroke-width="1.2"/>`).join('');
+  const piv = (x, y, outer, inner, lab, lx, ly) => `<rect x="${x - 22}" y="${y - 12}" width="44" height="24" fill="rgba(2,8,14,.95)" stroke="${outer}" stroke-width="2.2"/><line x1="${x - 28}" y1="${y - 9}" x2="${x - 28}" y2="${y + 9}" stroke="${inner}" stroke-width="3"/><line x1="${x + 28}" y1="${y - 9}" x2="${x + 28}" y2="${y + 9}" stroke="${inner}" stroke-width="3"/>${pill(lx, ly, lab, 'var(--accent2)', '#fff')}`;
+  let s = ''; for (let x = 0; x <= 680; x += 40) s += `<line class="grid" x1="${x}" y1="0" x2="${x}" y2="440"/>`; for (let y = 0; y <= 440; y += 40) s += `<line class="grid" x1="0" y1="${y}" x2="680" y2="${y}"/>`;
+  s += `<line x1="30" y1="${ay}" x2="660" y2="${ay}" stroke="var(--accent2)" stroke-width="1" stroke-dasharray="16 4 3 4" opacity=".8"/>` + tt(662, ay + 4, 'x', 't-tag') + tt(318, ay + 30, 'O', 't-tag', 'middle', 'fill:#fff');
+  // S1 : arbre + maneton
+  s += `<path d="M412 ${ay}H240V176H150" fill="none" stroke="${KC.s1}" stroke-width="4" class="glow" style="color:${KC.s1}"/>`;
+  s += `<line x1="226" y1="${ay}" x2="226" y2="176" stroke="var(--muted)"/><path d="M222 ${ay}h8M222 176h8" stroke="var(--muted)"/>` + tt(216, 210, 'e', 't-tag', 'end', 'fill:#fff') + tt(140, 172, 'A', 't-tag', 'end', 'fill:#fff');
+  // L1 pivot S1/S0
+  s += piv(320, ay, KC.s0, KC.s1, 'L1', 320, ay - 30) + `<line x1="320" y1="${ay + 12}" x2="320" y2="318" stroke="var(--ink)" stroke-width="2"/>` + gnd(320, 318, 70);
+  // L2 pivot S2/S1 sur le maneton
+  s += piv(188, 176, KC.s2, KC.s1, 'L2', 188, 146);
+  // S2 : volute mobile
+  s += `<path d="M188 164V112H96" fill="none" stroke="${KC.s2}" stroke-width="4"/><line x1="96" y1="52" x2="96" y2="172" stroke="${KC.s2}" stroke-width="6" class="glow" style="color:${KC.s2}"/>`;
+  let sp = 'M76 112'; for (let a = 0; a < 14; a += 0.3) sp += `L${(76 - 1.2 * a * Math.cos(a)).toFixed(1)} ${(112 + 1.2 * a * Math.sin(a)).toFixed(1)}`; s += `<path d="${sp}" fill="none" stroke="${KC.s2}" stroke-width="1.2" opacity=".8"/>`;
+  s += `<line x1="96" y1="172" x2="96" y2="250" stroke="${KC.s2}" stroke-width="4"/>`;
+  // L4 glissière ⊥ (z) S2/S3
+  s += `<rect x="80" y="250" width="32" height="32" fill="rgba(2,8,14,.95)" stroke="${KC.s2}" stroke-width="2.2"/><rect x="89" y="259" width="14" height="14" fill="${KC.s3}"/>` + pill(146, 266, 'L4', 'var(--accent2)', '#fff') + tt(146, 292, LL('glissière z', 'prismatic z'), 't-s', 'middle');
+  // S3 (Oldham) + L3 glissière y S3/S0
+  s += `<line x1="96" y1="282" x2="96" y2="410" stroke="${KC.s3}" stroke-width="4"/><rect x="82" y="334" width="28" height="40" fill="rgba(2,8,14,.95)" stroke="${KC.s0}" stroke-width="2.2"/><line x1="110" y1="354" x2="150" y2="354" stroke="var(--ink)" stroke-width="2"/>`;
+  s += `<line x1="150" y1="330" x2="150" y2="378" stroke="var(--ink)" stroke-width="2"/>` + Array.from({ length: 6 }, (_, i) => `<line x1="150" y1="${332 + i * 8}" x2="159" y2="${326 + i * 8}" stroke="var(--muted)" stroke-width="1.2"/>`).join('') + pill(190, 354, 'L3', 'var(--accent2)', '#fff') + tt(190, 380, LL('glissière y', 'prismatic y'), 't-s', 'middle');
+  // L6 embrayage S1/S4
+  s += `<line x1="412" y1="196" x2="412" y2="276" stroke="${KC.s1}" stroke-width="5"/><line x1="428" y1="196" x2="428" y2="276" stroke="${KC.s4}" stroke-width="5"/>`;
+  s += `<rect x="404" y="150" width="32" height="26" fill="rgba(2,8,14,.95)" stroke="#ff3d6e" stroke-width="1.6"/><path d="M408 163l4 -6l4 12l4 -12l4 12l4 -6" fill="none" stroke="#ff3d6e" stroke-width="1.3"/>` + tt(420, 142, '12 V', 't-s', 'middle', 'fill:#ff3d6e') + pill(420, 300, 'L6', 'var(--accent2)', '#fff') + tt(420, 326, LL('embrayage', 'clutch'), 't-s', 'middle');
+  // S4 : poulie + L5 pivot S4/S0
+  s += `<path d="M428 ${ay}H600" stroke="${KC.s4}" stroke-width="4"/>` + piv(510, ay, KC.s0, KC.s4, 'L5', 510, ay - 30) + `<line x1="510" y1="${ay + 12}" x2="510" y2="318" stroke="var(--ink)" stroke-width="2"/>` + gnd(510, 318, 70);
+  s += `<rect x="592" y="150" width="22" height="172" fill="rgba(180,92,255,.12)" stroke="${KC.s4}" stroke-width="2.2" class="glow" style="color:${KC.s4}"/>` + Array.from({ length: 6 }, (_, i) => `<path d="M592 ${166 + i * 26}l11 6l11 -6" fill="none" stroke="${KC.s4}" stroke-width="1"/>`).join('');
+  // étiquettes des classes
+  const lab = (x, y, n, txt, col) => tt(x, y, n, 't-b', 'middle', `fill:${col};font-size:15px`) + tt(x, y + 14, txt, 't-s', 'middle');
+  s += lab(370, 216, 'S1', LL('arbre', 'shaft'), KC.s1) + lab(60, 44, 'S2', LL('volute mobile', 'orb. scroll'), KC.s2) + lab(58, 420, 'S3', 'Oldham', KC.s3) + lab(632, 140, 'S4', LL('poulie', 'pulley'), KC.s4) + lab(415, 356, 'S0', LL('bâti', 'frame'), 'var(--ink)');
+  // trièdre
+  s += `<g transform="translate(600 392)"><line x1="0" y1="0" x2="40" y2="0" stroke="var(--accent2)" stroke-width="1.6"/>${arw(40, 0, 0, 'var(--accent2)', 5)}<line x1="0" y1="0" x2="0" y2="-36" stroke="var(--accent2)" stroke-width="1.6"/>${arw(0, -36, -90, 'var(--accent2)', 5)}<circle r="6" fill="none" stroke="var(--accent2)"/><circle r="1.8" fill="var(--accent2)"/>${tt(46, 4, 'x', 't-s')}${tt(-4, -42, 'y', 't-s', 'end')}${tt(-10, 14, 'z', 't-s', 'end')}</g>`;
+  svg.innerHTML = s; svg.classList.add('eng'); }
+
+/* Graphe des liaisons */
+function drawGraph(){ const svg = document.getElementById('graphSvg'); if (!svg) return;
+  const N = { S0: [260, 205, KC.s0, LL('bâti', 'frame')], S1: [86, 260, KC.s1, LL('arbre', 'shaft')], S2: [120, 72, KC.s2, LL('volute mob.', 'orb. scroll')], S3: [380, 72, KC.s3, 'Oldham'], S4: [434, 260, KC.s4, LL('poulie', 'pulley')] };
+  const Ed = [['S1', 'S0', 'L1', LL('pivot (O,x)', 'revolute (O,x)')], ['S2', 'S1', 'L2', LL('pivot (A,x)', 'revolute (A,x)')], ['S3', 'S0', 'L3', LL('glissière y', 'prismatic y')], ['S2', 'S3', 'L4', LL('glissière z', 'prismatic z')], ['S4', 'S0', 'L5', LL('pivot (O,x)', 'revolute (O,x)')]];
+  let s = '';
+  Ed.forEach(([a, b, l, j]) => { const [x1, y1] = N[a], [x2, y2] = N[b], mx = (x1 + x2) / 2, my = (y1 + y2) / 2; s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--accent)" stroke-width="1.6" opacity=".8"/>${pill(mx, my, l, 'var(--accent)')}${tt(mx, my + 22, j, 't-s', 'middle', 'fill:#cfe9ff')}`; });
+  s += `<path d="M${N.S1[0]} ${N.S1[1] + 30} Q 260 400 ${N.S4[0]} ${N.S4[1] + 30}" fill="none" stroke="#ff3d6e" stroke-width="1.6" stroke-dasharray="6 5"/>${pill(260, 330, 'L6', '#ff3d6e')}${tt(260, 352, LL('encastrement si bobine 12 V', 'rigid when coil at 12 V'), 't-s', 'middle', 'fill:#ffb3c6')}`;
+  for (const k in N) { const [x, y, col, n] = N[k]; s += `<circle cx="${x}" cy="${y}" r="28" fill="rgba(2,8,14,.95)" stroke="${col}" stroke-width="2.2" class="glow" style="color:${col}"/>${tt(x, y + 5, k, 't-b', 'middle', `fill:${col};font-size:15px`)}${tt(x, y - 36, n, 't-s', 'middle')}`; }
+  s += `<rect class="box acc" x="370" y="126" width="144" height="46"/>${tt(380, 144, LL('nombre cyclomatique', 'cyclomatic number'), 't-s')}${tt(380, 164, 'γ = 6 − 5 + 1 = 2', 't-m', '', 'fill:var(--accent);font-weight:700')}`;
+  svg.innerHTML = s; svg.classList.add('eng'); }
+
+function figCycle(){ drawPID(tEv.value, tCd.value); drawPH(tEv.value, tCd.value, Math.min(0.95, Math.max(0.3, +etaIs.value || 0.7))); }
+listeners.push(drawOcto, drawFast, drawKin, drawGraph);
 /* interface : progression, section active, balayage, lumière qui suit la souris */
 const prog = document.getElementById('progress'), navEl = document.querySelector('.nav'), navA = [...document.querySelectorAll('.nav a')];
 addEventListener('scroll', () => { const h = document.documentElement; prog.style.transform = `scaleX(${h.scrollTop / Math.max(1, h.scrollHeight - h.clientHeight)})`; }, { passive: true });
