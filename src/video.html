@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><title>Rendu vidéo · compresseur scroll</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
 <style>body{margin:0;background:#111;color:#ddd;font:14px system-ui}#c{width:960px;height:540px;display:block}#log{padding:8px;font-family:monospace;white-space:pre-wrap}</style></head>
 <body><canvas id="c" width="1280" height="720"></canvas><div id="log">prêt</div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
@@ -8,17 +8,17 @@
 <script src="model.js"></script>
 <script>
 const W = 1280, H = 720, FPS = 30, DUR = 72;
-const C = { bg: '#0a0f14', panel: '#131b23', ink: '#e6ecf1', muted: '#8a98a6', line: '#2a3744', accent: '#f2a93b', lp: '#4b8cff', hp: '#ff5b3a', mid: '#b06ad8' };
+const C = { bg: '#040912', panel: '#0a1626', ink: '#e6f6ff', muted: '#7d97b0', line: '#16334a', accent: '#22f0ff', lp: '#3a8bff', hp: '#ff3d6e', mid: '#b45cff' };
 const out = document.getElementById('c'), ctx = out.getContext('2d');
 const logEl = document.getElementById('log'); const log = s => { logEl.textContent = s; fetch('/log', { method: 'POST', body: s }).catch(() => {}); };
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), seg = (t, a, b) => clamp((t - a) / (b - a)), ease = x => x < .5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2, eout = x => 1 - (1 - x) ** 3;
-const DISP = '"Archivo", Arial, sans-serif', BODY = '"IBM Plex Sans", Arial, sans-serif', MONO = '"IBM Plex Mono", monospace';
+const DISP = '"Chakra Petch", Arial, sans-serif', BODY = '"IBM Plex Sans", Arial, sans-serif', MONO = '"IBM Plex Mono", monospace';
 
 /* ---- 3D ---- */
 const glc = document.createElement('canvas'); glc.width = W; glc.height = H;
 const renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1); renderer.setSize(W, H, false);
-renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.82;
+renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.7;
 renderer.localClippingEnabled = true; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 { const s = new THREE.Scene(); s.background = new THREE.Color(0x262b31);
@@ -28,21 +28,21 @@ const scene = new THREE.Scene();
 const cam = new THREE.PerspectiveCamera(32, W / H, 0.5, 600);
 const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(18, 40, 22); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
 Object.assign(key.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 150 }); scene.add(key);
-scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x1a1d21, 0.35));
+scene.add(new THREE.HemisphereLight(0xbfe8ff, 0x05080d, 0.3)); { const a = new THREE.DirectionalLight(0x22f0ff, 2.4); a.position.set(-26, 14, -22); scene.add(a); const b = new THREE.DirectionalLight(0xff2fd0, 0.7); b.position.set(30, 4, -12); scene.add(b); const g = new THREE.GridHelper(300, 120, 0x22f0ff, 0x1b6f8a); g.material.transparent = true; g.material.opacity = 0.28; g.material.depthWrite = false; scene.add(g); window.GRID = g; }
 const model = SC.build(THREE); scene.add(model.root);
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity: 0.3 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
 function camAt(az, el, dist, tx, ty, tz) { cam.position.set(tx + dist * Math.cos(el) * Math.sin(az), ty + dist * Math.sin(el), tz + dist * Math.cos(el) * Math.cos(az)); cam.lookAt(tx, ty, tz); }
-function render3d(groundY) { ground.position.y = groundY; renderer.render(scene, cam); ctx.drawImage(glc, 0, 0); }
+function render3d(groundY) { ground.position.y = groundY; GRID.position.y = groundY + 0.01; renderer.render(scene, cam); ctx.drawImage(glc, 0, 0); }
 function project(id) { const b = new THREE.Box3().setFromObject(model.parts[id].g); const v = b.getCenter(new THREE.Vector3()).project(cam); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; }
 const pr = SC.makePocketRenderer(240);
 
 /* ---- outils 2D ---- */
-function bg(glow) { const g = ctx.createRadialGradient(W * .68, H * .45, 40, W * .68, H * .45, W * .7); g.addColorStop(0, glow || '#16243a'); g.addColorStop(1, C.bg); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  ctx.strokeStyle = 'rgba(255,255,255,0.035)'; ctx.lineWidth = 1; for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); ctx.stroke(); } for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); } }
+function bg(glow) { const g = ctx.createRadialGradient(W * .68, H * .45, 40, W * .68, H * .45, W * .7); g.addColorStop(0, glow || '#0c2a3a'); g.addColorStop(1, C.bg); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(90,210,255,0.06)'; ctx.lineWidth = 1; for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); ctx.stroke(); } for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); } }
 function txt(s, x, y, font, color, align, alpha) { ctx.save(); ctx.globalAlpha = alpha === undefined ? 1 : alpha; ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align || 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y); ctx.restore(); }
 function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
-function chip(x, y, label, color, alpha) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `600 15px ${MONO}`; const w = ctx.measureText(label).width + 22; rrect(x, y, w, 30, 6); ctx.fillStyle = color; ctx.fill(); ctx.fillStyle = '#14100a'; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 11, y + 16); ctx.restore(); return w; }
+function chip(x, y, label, color, alpha) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `600 15px ${MONO}`; const w = ctx.measureText(label).width + 22; rrect(x, y, w, 30, 6); ctx.fillStyle = color; ctx.fill(); ctx.fillStyle = '#001218'; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 11, y + 16); ctx.restore(); return w; }
 function sceneTag(n, fr, en, a) { chip(56, 48, n, C.accent, a); txt(fr.toUpperCase(), 56 + 52, 69, `600 15px ${MONO}`, C.ink, 'left', a); ctx.font = `600 15px ${MONO}`; const w = ctx.measureText(fr.toUpperCase()).width; txt('· ' + en.toUpperCase(), 56 + 62 + w, 69, `500 15px ${MONO}`, C.muted, 'left', a); }
 
 /* ---- sous-titres bilingues ---- */
@@ -72,15 +72,15 @@ const KEYS = [['voluteFixe', 'Volute fixe', 'Fixed scroll'], ['voluteMobile', 'V
 function resetModel() { const s = model.state; s.explode = 0; s.gap = 0; s.theta = 0; s.pulley = 0; model.root.rotation.set(0, 0, 0); model.setClip([]); model.highlight(null, 0); model.root.updateMatrixWorld(true); }
 
 function sTitle(t) { // 0–7
-  bg('#15263d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
+  bg('#0b2c3d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
   cam.setViewOffset(W, H, -W * 0.2, 0, W, H); camAt(0.6 + t * 0.12, 0.3, 64, 0, 9.5, 0); render3d(-0.45); cam.clearViewOffset();
   const a = eout(seg(t, .3, 1.4));
   txt('DOSSIER TECHNIQUE · SAÉ 1.1 · BUT GMP', 72, 210, `500 17px ${MONO}`, C.muted, 'left', a);
-  ctx.save(); ctx.globalAlpha = a; ctx.font = `900 112px ${DISP}`; ctx.fontStretch = 'expanded'; ctx.fillStyle = C.ink; ctx.fillText('Compresseur', 66 - (1 - a) * 30, 320); ctx.fillStyle = C.accent; ctx.fillText('scroll', 66 - (1 - a) * 30, 430); ctx.restore();
+  ctx.save(); ctx.globalAlpha = a; ctx.font = `700 112px ${DISP}`; ctx.fontStretch = 'expanded'; ctx.fillStyle = C.ink; ctx.fillText('Compresseur', 66 - (1 - a) * 30, 320); ctx.fillStyle = C.accent; ctx.fillText('scroll', 66 - (1 - a) * 30, 430); ctx.restore();
   txt('Scroll compressor', 72, 486, `600 34px ${DISP}`, C.muted, 'left', eout(seg(t, 1.0, 2.0)));
 }
 function sLoop(t) { // 7–17
-  bg('#112033'); const a = eout(seg(t, 7, 7.8)); sceneTag('01', 'Rôle', 'Function', a);
+  bg('#0a2433'); const a = eout(seg(t, 7, 7.8)); sceneTag('01', 'Rôle', 'Function', a);
   const boxes = [[200, 340, 'Compresseur', 'Compressor', true], [560, 150, 'Condenseur', 'Condenser'], [920, 340, 'Détendeur', 'Expansion valve'], [560, 520, 'Évaporateur', 'Evaporator']];
   const hp = [[200, 340], [200, 150], [560, 150], [920, 150], [920, 340]], lp = [[920, 340], [920, 520], [560, 520], [200, 520], [200, 340]];
   const pipe = (pts, col, lag) => { ctx.save(); ctx.globalAlpha = a * .35; ctx.strokeStyle = col; ctx.lineWidth = 12; ctx.lineJoin = 'round'; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.restore();
@@ -88,46 +88,46 @@ function sLoop(t) { // 7–17
     ctx.fillStyle = col; for (let d = ((t - 7) * 140 + lag) % 34; d < L; d += 34) { const s = segs.find(s => d >= s[2] && d < s[2] + s[3]); const k = (d - s[2]) / s[3]; ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(s[0][0] + (s[1][0] - s[0][0]) * k, s[0][1] + (s[1][1] - s[0][1]) * k, 4.5, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; };
   pipe(hp, C.hp, 0); pipe(lp, C.lp, 0);
   boxes.forEach((b, i) => { const ba = eout(seg(t, 7.2 + i * .25, 7.8 + i * .25)); ctx.save(); ctx.globalAlpha = ba; rrect(b[0] - 120, b[1] - 46, 240, 92, 14); ctx.fillStyle = b[4] ? C.accent : C.panel; ctx.fill(); if (!b[4]) { ctx.strokeStyle = '#3a4a5a'; ctx.lineWidth = 2; ctx.stroke(); } ctx.restore();
-    txt(b[2], b[0], b[1] - 2, `700 24px ${DISP}`, b[4] ? '#1a1205' : C.ink, 'center', ba); txt(b[3], b[0], b[1] + 26, `italic 400 17px ${BODY}`, b[4] ? '#3d2a0a' : C.muted, 'center', ba); });
+    txt(b[2], b[0], b[1] - 2, `700 24px ${DISP}`, b[4] ? '#001218' : C.ink, 'center', ba); txt(b[3], b[0], b[1] + 26, `italic 400 17px ${BODY}`, b[4] ? '#06424d' : C.muted, 'center', ba); });
   txt('HP ≈ 15 bar · 80 °C', 222, 250, `600 18px ${MONO}`, C.hp, 'left', a); txt('BP / LP ≈ 2 bar · 5 °C', 222, 455, `600 18px ${MONO}`, C.lp, 'left', a);
 }
 function sExplode(t) { // 17–35
-  bg('#14202e'); resetModel(); const s = model.state; model.root.rotation.z = -Math.PI / 2;
+  bg('#0a1f2e'); resetModel(); const s = model.state; model.root.rotation.z = -Math.PI / 2;
   const e = ease(seg(t, 19, 24)); s.explode = e * 0.62 / s.spread; s.spread = 0.62; s.explode = e;
   s.theta = (t - 17) * 1.2; s.pulley = (t - 17) * 1.2; model.apply();
   const ci = Math.floor((t - 24) / 1.37); const cur = t >= 24 && ci < KEYS.length ? KEYS[ci] : null;
-  model.highlight(cur ? cur[0] : null, 0xf2a93b); model.root.updateMatrixWorld(true);
+  model.highlight(cur ? cur[0] : null, 0x22f0ff); model.root.updateMatrixWorld(true);
   const dist = 50 + e * 44, tx = 2 + e * 8; camAt(0.5 + (t - 17) * 0.025, 0.28, dist, tx, 7.5 - e * 1, 0); render3d(-6.4);
   sceneTag('02', 'Vue éclatée', 'Exploded view', eout(seg(t, 17, 17.8)));
   if (cur) { const la = Math.min(eout(seg(t, 24 + ci * 1.37, 24.3 + ci * 1.37)), 1 - seg(t, 23.1 + (ci + 1) * 1.37, 24 + (ci + 1) * 1.37)); const [px, py] = project(cur[0]);
     const lx = clamp(px + (py > H / 2 ? -40 : 40), 140, W - 340), ly = py > H / 2 ? py - 150 : py + 120;
     ctx.save(); ctx.globalAlpha = la; ctx.strokeStyle = C.accent; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(lx, ly); ctx.lineTo(lx + 20, ly); ctx.stroke();
     ctx.fillStyle = C.accent; ctx.beginPath(); ctx.arc(px, py, 7, 0, 7); ctx.fill(); ctx.globalAlpha = la * .35; ctx.beginPath(); ctx.arc(px, py, 14, 0, 7); ctx.fill(); ctx.restore();
-    ctx.save(); ctx.globalAlpha = la; ctx.font = `700 28px ${DISP}`; const w = Math.max(ctx.measureText(cur[1]).width, 180) + 36; rrect(lx + 20, ly - 38, w, 76, 10); ctx.fillStyle = 'rgba(19,27,35,0.92)'; ctx.fill(); ctx.strokeStyle = C.accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.globalAlpha = la; ctx.font = `700 28px ${DISP}`; const w = Math.max(ctx.measureText(cur[1]).width, 180) + 36; rrect(lx + 20, ly - 38, w, 76, 10); ctx.fillStyle = 'rgba(4,14,24,0.92)'; ctx.fill(); ctx.strokeStyle = C.accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
     txt(cur[1], lx + 38, ly - 2, `700 28px ${DISP}`, C.ink, 'left', la); txt(cur[2], lx + 38, ly + 26, `italic 400 19px ${BODY}`, C.accent, 'left', la);
     txt(String(SC.REP[cur[0]]).padStart(2, '0'), lx + 20 + w - 12, ly - 14, `600 15px ${MONO}`, C.muted, 'right', la); }
 }
 function sPockets(t) { // 35–52
-  bg('#16182b'); const a = eout(seg(t, 35, 35.8)); sceneTag('03', 'Fonctionnement', 'How it works', a);
+  bg('#1a1030'); const a = eout(seg(t, 35, 35.8)); sceneTag('03', 'Fonctionnement', 'How it works', a);
   const th = (t - 35) * 2.1; const size = 560, x0 = 110, y0 = 104;
-  ctx.save(); ctx.globalAlpha = a; ctx.translate(x0, y0); pr.draw(ctx, size, th, { lp: C.lp, hp: C.hp, mid: C.mid, fixed: '#9aa4ad', mobile: '#d9b56d', edge: 'rgba(0,0,0,.4)', showOrbit: true, orbitColor: '#f6d38f' }); ctx.restore();
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x0, y0); pr.draw(ctx, size, th, { lp: C.lp, hp: C.hp, mid: C.mid, fixed: '#8fd3ef', mobile: '#ffb547', edge: 'rgba(0,12,20,.6)', showOrbit: true, orbitColor: '#ff2fd0' }); ctx.restore();
   const steps = [['Aspiration', 'Intake'], ['Translation circulaire', 'Circular translation'], ['Compression', 'Compression'], ['Refoulement', 'Outlet']];
   const k = t < 39 ? 0 : t < 43.5 ? 1 : t < 48 ? 2 : 3;
-  steps.forEach((s, i) => { const y = 180 + i * 104, on = i === k, sa = a * eout(seg(t, 35.4 + i * .2, 36 + i * .2)); ctx.save(); ctx.globalAlpha = sa; rrect(760, y, 440, 84, 12); ctx.fillStyle = on ? 'rgba(242,169,59,0.14)' : C.panel; ctx.fill(); ctx.strokeStyle = on ? C.accent : '#2a3744'; ctx.lineWidth = on ? 2 : 1; ctx.stroke();
+  steps.forEach((s, i) => { const y = 180 + i * 104, on = i === k, sa = a * eout(seg(t, 35.4 + i * .2, 36 + i * .2)); ctx.save(); ctx.globalAlpha = sa; rrect(760, y, 440, 84, 12); ctx.fillStyle = on ? 'rgba(34,240,255,0.14)' : C.panel; ctx.fill(); ctx.strokeStyle = on ? C.accent : '#2a3744'; ctx.lineWidth = on ? 2 : 1; ctx.stroke();
     rrect(778, y + 18, 48, 48, 9); ctx.fillStyle = on ? C.accent : '#1d2833'; ctx.fill(); ctx.restore();
-    txt(String(i + 1), 802, y + 51, `700 24px ${MONO}`, on ? '#1a1205' : C.ink, 'center', sa); txt(s[0], 846, y + 40, `700 24px ${DISP}`, C.ink, 'left', sa); txt(s[1], 846, y + 66, `italic 400 17px ${BODY}`, on ? C.accent : C.muted, 'left', sa); });
+    txt(String(i + 1), 802, y + 51, `700 24px ${MONO}`, on ? '#001218' : C.ink, 'center', sa); txt(s[0], 846, y + 40, `700 24px ${DISP}`, C.ink, 'left', sa); txt(s[1], 846, y + 66, `italic 400 17px ${BODY}`, on ? C.accent : C.muted, 'left', sa); });
   const g = ctx.createLinearGradient(760, 0, 1000, 0); g.addColorStop(0, C.lp); g.addColorStop(.5, C.mid); g.addColorStop(1, C.hp);
   ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g; rrect(760, 610, 240, 10, 5); ctx.fill(); ctx.restore();
   txt('BP / LP', 760, 600, `600 14px ${MONO}`, C.lp, 'left', a); txt('HP', 1000, 600, `600 14px ${MONO}`, C.hp, 'right', a);
 }
 function sClutch(t) { // 52–62
-  bg('#1b1a24'); resetModel(); const s = model.state; const on = t >= 57; const k = on ? eout(seg(t, 57, 57.35)) : 0;
+  bg('#160f26'); resetModel(); const s = model.state; const on = t >= 57; const k = on ? eout(seg(t, 57, 57.35)) : 0;
   s.gap = 0.45 * (1 - k); s.pulley = (t - 52) * 7; s.theta = on ? (t - 57) * 7 * k : 0; model.apply();
   model.setClip([clip]); model.root.updateMatrixWorld(true);
   const coil = model.parts.electro.g; coil.traverse(o => { if (o.isMesh) { o.material.emissive.setHex(on ? 0xff3a10 : 0x000000); o.material.emissiveIntensity = on ? 0.6 : 1; } });
   camAt(0.35 + (t - 52) * 0.02, 0.42, 34, 0, 14.5, 0); render3d(-0.45);
   sceneTag('04', 'Poulie débrayable', 'Clutch pulley', eout(seg(t, 52, 52.8)));
-  const x = 980, y = 170; ctx.save(); rrect(x, y, 230, 120, 14); ctx.fillStyle = 'rgba(19,27,35,0.92)'; ctx.fill(); ctx.strokeStyle = on ? '#3fbf7f' : '#3a4a5a'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+  const x = 980, y = 170; ctx.save(); rrect(x, y, 230, 120, 14); ctx.fillStyle = 'rgba(4,14,24,0.92)'; ctx.fill(); ctx.strokeStyle = on ? '#3fbf7f' : '#3a4a5a'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
   txt(on ? '12 V' : '0 V', x + 24, y + 58, `700 40px ${MONO}`, on ? '#3fbf7f' : C.muted); txt(on ? 'EMBRAYÉ · ENGAGED' : 'DÉBRAYÉ · DISENGAGED', x + 24, y + 92, `600 14px ${MONO}`, on ? '#3fbf7f' : C.muted);
 }
 function sHistory(t) { // 62–72
@@ -138,16 +138,16 @@ function sHistory(t) { // 62–72
     txt(e[0], x - 10, y - 40 - (1 - a) * 20, `700 46px ${MONO}`, C.ink, 'left', a); txt(e[1], x - 10, y + 56, `700 24px ${DISP}`, C.accent, 'left', a); txt(e[2], x - 10, y + 88, `400 18px ${BODY}`, C.ink, 'left', a); txt(e[3], x - 10, y + 114, `italic 400 16px ${BODY}`, C.muted, 'left', a); });
 }
 function sOutro(t) { // 72–82
-  bg('#15263d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
+  bg('#0b2c3d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
   if (t < 77) {
     sceneTag('05', 'Avantages', 'Advantages', eout(seg(t, 72, 72.8)));
     const adv = [['Compression continue', 'Continuous compression', C.lp], ['Moins de bruit', 'Lower noise levels', C.mid], ['Meilleur rendement', 'Increased efficiency', C.hp]];
     adv.forEach((d, i) => { const a = eout(seg(t, 72.5 + i * .6, 73.2 + i * .6)) * (1 - seg(t, 76.5, 77)); const x = 90 + i * 380, y = 250 - (1 - a) * 30; ctx.save(); ctx.globalAlpha = a; rrect(x, y, 340, 190, 16); ctx.fillStyle = C.panel; ctx.fill(); ctx.strokeStyle = d[2]; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = d[2]; rrect(x + 28, y + 30, 46, 8, 4); ctx.fill(); ctx.restore();
-      txt(d[0], x + 28, y + 100, `800 26px ${DISP}`, C.ink, 'left', a); txt(d[1], x + 28, y + 140, `italic 400 21px ${BODY}`, d[2], 'left', a); });
+      txt(d[0], x + 28, y + 100, `700 26px ${DISP}`, C.ink, 'left', a); txt(d[1], x + 28, y + 140, `italic 400 21px ${BODY}`, d[2], 'left', a); });
   } else {
     cam.setViewOffset(W, H, W * 0.2, 0, W, H); camAt(0.6 + t * 0.1, 0.3, 60, 0, 9.5, 0); render3d(-0.45); cam.clearViewOffset();
     const a = eout(seg(t, 77, 78));
-    ctx.save(); ctx.globalAlpha = a; ctx.font = `900 92px ${DISP}`; ctx.fillStyle = C.ink; ctx.textAlign = 'right'; ctx.fillText('Compresseur', W - 70, 300); ctx.fillStyle = C.accent; ctx.fillText('scroll', W - 70, 392); ctx.restore();
+    ctx.save(); ctx.globalAlpha = a; ctx.font = `700 92px ${DISP}`; ctx.fillStyle = C.ink; ctx.textAlign = 'right'; ctx.fillText('Compresseur', W - 70, 300); ctx.fillStyle = C.accent; ctx.fillText('scroll', W - 70, 392); ctx.restore();
     txt('Scroll compressor', W - 72, 444, `600 30px ${DISP}`, C.muted, 'right', a);
     txt('SAÉ 1.1 · ANALYSE DE PRODUIT GRAND PUBLIC · BUT GMP', W - 72, 520, `500 16px ${MONO}`, C.muted, 'right', a);
   }
@@ -181,7 +181,7 @@ async function music() {
 
 /* ---- encodage ---- */
 async function run() {
-  await document.fonts.load(`900 100px ${DISP}`); await document.fonts.load(`600 20px ${BODY}`); await document.fonts.load(`italic 400 20px ${BODY}`); await document.fonts.load(`600 16px ${MONO}`); await document.fonts.ready;
+  await document.fonts.load(`700 100px ${DISP}`); await document.fonts.load(`600 20px ${BODY}`); await document.fonts.load(`italic 400 20px ${BODY}`); await document.fonts.load(`600 16px ${MONO}`); await document.fonts.ready;
   let vcodec = null; for (const c of ['avc1.640028', 'avc1.4d0028', 'avc1.42002a']) { const r = await VideoEncoder.isConfigSupported({ codec: c, width: W, height: H, bitrate: 1.15e6, framerate: FPS }); if (r.supported) { vcodec = c; break; } }
   if (!vcodec) { log('H.264 indisponible'); return; }
   let acfg = { codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 96000 }; let audio = false;
