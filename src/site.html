@@ -1,0 +1,1024 @@
+<title>Compresseur Scroll · SAÉ 1.1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Mise en page : planche d'ingénierie sombre — un viewer 3D en tête, puis le dossier en sections numérotées (ordre imposé par le sujet).
+   Bleu = basse pression, rouge = haute pression : les deux couleurs du circuit frigorifique servent de code partout. */
+:root{
+  color-scheme:dark;
+  --bg:#0a0f14; --bg2:#0f161d; --panel:#131b23; --panel2:#18222c; --ink:#e6ecf1; --muted:#8a98a6; --line:#23303c; --line2:#314150;
+  --accent:#f2a93b; --accent-ink:#f6bd62; --lp:#4b8cff; --hp:#ff5b3a; --mid:#b06ad8; --alu:#c4ccd3; --ok:#3fbf7f; --bad:#ff6b5a;
+  --f-disp:"Archivo","Arial Narrow",system-ui,sans-serif; --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;
+  --bg:#eef2f5; --bg2:#e5eaef; --panel:#ffffff; --panel2:#f4f7f9; --ink:#0e161d; --muted:#566370; --line:#cfd7de; --line2:#b9c4ce;
+  --accent:#b56a00; --accent-ink:#9a5a00; --lp:#1c5fdc; --hp:#d8391b; --mid:#8a3fb8; --alu:#5d6873; --ok:#1d8a55; --bad:#c9341f;}}
+:root[data-theme="light"]{color-scheme:light;
+  --bg:#eef2f5; --bg2:#e5eaef; --panel:#ffffff; --panel2:#f4f7f9; --ink:#0e161d; --muted:#566370; --line:#cfd7de; --line2:#b9c4ce;
+  --accent:#b56a00; --accent-ink:#9a5a00; --lp:#1c5fdc; --hp:#d8391b; --mid:#8a3fb8; --alu:#5d6873; --ok:#1d8a55; --bad:#c9341f;}
+
+/* langue : chaque texte existe en deux versions */
+:root[data-lang="fr"] [data-l="en"], :root[data-lang="en"] [data-l="fr"], :root:not([data-lang]) [data-l="en"]{display:none!important}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background:var(--bg);color:var(--ink);font:16px/1.62 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-disp);margin:0;text-wrap:balance;line-height:1.05}
+h2{font-size:clamp(1.7rem,3.6vw,2.6rem);font-weight:800;font-stretch:112%;letter-spacing:-.01em}
+h3{font-size:1.12rem;font-weight:700;font-stretch:100%}
+p{margin:0;max-width:66ch}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:500 .74rem/1.2 var(--f-mono);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* barre */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:58px}
+.brand{font:800 1rem/1 var(--f-disp);font-stretch:125%;letter-spacing:.02em;text-decoration:none;color:var(--ink);white-space:nowrap;display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;mask-image:linear-gradient(90deg,#000 92%,transparent)}
+.nav::-webkit-scrollbar{display:none}
+.nav a{font:500 .8rem/1 var(--f-body);color:var(--muted);text-decoration:none;padding:8px 9px;border-radius:6px;white-space:nowrap}
+.nav a b{font:600 .7rem var(--f-mono);color:var(--accent-ink);margin-right:5px}
+.nav a:hover{color:var(--ink);background:var(--panel)}
+.lang{display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden;flex:none}
+.lang button{font:600 .78rem/1 var(--f-mono);letter-spacing:.06em;padding:8px 11px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* hero */
+.hero{position:relative;border-bottom:1px solid var(--line);background:
+  radial-gradient(ellipse 60% 70% at 72% 45%,color-mix(in srgb,var(--lp) 14%,transparent),transparent 70%),
+  radial-gradient(ellipse 40% 50% at 80% 70%,color-mix(in srgb,var(--hp) 10%,transparent),transparent 70%),var(--bg)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:24px;align-items:center;padding-block:40px 32px}
+.hero h1{font-size:clamp(2.5rem,5.6vw,4.7rem);font-weight:900;font-stretch:108%;letter-spacing:-.03em;line-height:.95;overflow-wrap:anywhere}
+.hero h1 em{font-style:normal;color:var(--accent);font-stretch:125%}
+.hero h1 .l2{display:block;font-stretch:62%;font-weight:600;color:var(--muted);font-size:.42em;letter-spacing:.01em;margin-top:14px}
+.hero .lead{font-size:1.1rem;color:var(--muted);margin-top:18px}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line2);border-radius:10px;margin-top:26px;overflow:hidden;background:color-mix(in srgb,var(--panel) 70%,transparent)}
+.specs div{padding:11px 14px;border-bottom:1px solid var(--line);min-width:0}
+.specs div:nth-child(odd){border-right:1px solid var(--line)}
+.specs div:nth-last-child(-n+2){border-bottom:0}
+.specs dt{font:500 .66rem/1.2 var(--f-mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.specs dd{margin:3px 0 0;font:600 1rem/1.25 var(--f-body)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.btn{font:600 .9rem/1 var(--f-body);padding:11px 16px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stage{position:relative;aspect-ratio:1/1;max-height:640px;width:100%;max-width:100%}
+.stage canvas{width:100%;height:100%;display:block;touch-action:pan-y}
+.hint{position:absolute;bottom:10px;right:12px;font:500 .72rem var(--f-mono);color:var(--muted)}
+.pressure-key{display:flex;align-items:center;gap:8px;font:500 .74rem var(--f-mono);color:var(--muted)}
+.pressure-key i{width:84px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--lp),var(--mid),var(--hp))}
+
+/* sections */
+main{display:grid;gap:0}
+section.s{padding-block:72px;border-bottom:1px solid var(--line)}
+section.s:nth-of-type(even){background:var(--bg2)}
+.sh{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 18px;align-items:end;margin-bottom:30px}
+.sh .no{font:700 clamp(2.4rem,5vw,3.6rem)/.85 var(--f-mono);color:var(--accent);grid-row:span 2;letter-spacing:-.04em}
+.sh .other{font:500 .8rem/1.3 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:start}
+.cols>*{min-width:0}
+.stack{display:grid;gap:14px;align-content:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+figure{margin:0;display:grid;gap:10px;min-width:0}
+figcaption{font-size:.84rem;color:var(--muted)}
+figure svg{width:100%;height:auto;display:block}
+.note{border-left:3px solid var(--accent);padding:10px 14px;background:var(--panel);border-radius:0 8px 8px 0;font-size:.92rem;max-width:80ch}
+.tag{display:inline-block;font:600 .68rem/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 7px;border-radius:5px;border:1px dashed var(--accent);color:var(--accent-ink)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:600 .68rem/1.2 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);background:var(--panel2)}
+td.k{font:600 .85rem var(--f-mono);color:var(--accent-ink);white-space:nowrap}
+.min640{min-width:640px}
+
+/* histoire */
+.timeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;position:relative;margin-top:8px}
+.timeline::before{content:"";position:absolute;left:0;right:0;top:22px;height:2px;background:linear-gradient(90deg,var(--line2),var(--accent))}
+.ev{position:relative;padding:44px 14px 0 0;min-width:0}
+.ev::before{content:"";position:absolute;top:15px;left:0;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--accent)}
+.ev .y{font:700 1.7rem/1 var(--f-mono);letter-spacing:-.03em}
+.ev h3{margin-top:6px;font-size:1rem}
+.ev p{font-size:.88rem;color:var(--muted);margin-top:6px}
+
+/* fonctionnement */
+.pocket-stage{position:relative;max-width:520px;width:100%;margin-inline:auto;aspect-ratio:1/1}
+.pocket-stage canvas{width:100%;height:100%;display:block}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.controls label{display:flex;gap:10px;align-items:center;font-size:.86rem;color:var(--muted);flex:1 1 220px;min-width:0}
+.controls input[type=range]{flex:1;min-width:0;accent-color:var(--accent)}
+.readout{font:600 .9rem var(--f-mono);min-width:4.5ch;color:var(--ink)}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ol.steps li{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);transition:border-color .2s,background .2s}
+ol.steps li.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel))}
+ol.steps .n{font:700 1.1rem/40px var(--f-mono);text-align:center;border-radius:8px;background:var(--panel2);height:40px}
+ol.steps li.on .n{background:var(--accent);color:#1a1205}
+ol.steps b{font-family:var(--f-disp);font-weight:700}
+ol.steps small{display:block;font:500 .72rem var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.adv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:28px}
+.adv .card h3{display:flex;gap:10px;align-items:center}
+.adv .card p{color:var(--muted);font-size:.92rem;margin-top:8px}
+
+/* viewer éclaté */
+.viewer{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:0;border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:var(--panel)}
+.vmain{position:relative;min-width:0;background:radial-gradient(ellipse at 50% 40%,var(--panel2),var(--panel) 70%)}
+.vmain .stage{aspect-ratio:auto;height:clamp(440px,68vh,720px);max-height:none}
+.vmain canvas{touch-action:none;cursor:grab}
+.vmain canvas:active{cursor:grabbing}
+.vbar{position:absolute;left:12px;right:12px;top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;pointer-events:none}
+.vbar>*{pointer-events:auto}
+.vbar .btn{padding:8px 11px;font-size:.82rem;background:color-mix(in srgb,var(--panel) 85%,transparent);backdrop-filter:blur(6px)}
+.vbar .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.vexp{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:12px;align-items:center;background:color-mix(in srgb,var(--panel) 85%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line2);border-radius:10px;padding:8px 12px;font:500 .8rem var(--f-mono);color:var(--muted)}
+.vexp input{flex:1;min-width:0;accent-color:var(--accent)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:600 .78rem/1.2 var(--f-body);padding:6px 9px;border-radius:6px;transform:translate(12px,-50%);white-space:nowrap;z-index:3}
+.callout{position:absolute;pointer-events:none;font:600 .8rem/1.2 var(--f-mono);color:var(--accent-ink);z-index:2}
+.callout::before{content:"";position:absolute;left:-7px;top:50%;width:10px;height:10px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 30%,transparent)}
+.vside{border-left:1px solid var(--line2);display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0;max-height:clamp(440px,68vh,720px)}
+.info{padding:16px;border-bottom:1px solid var(--line2);display:grid;gap:8px;min-height:250px;align-content:start}
+.info .rep{font:700 .8rem var(--f-mono);color:var(--accent-ink)}
+.info h3{font-size:1.25rem}
+.info .alt{font:500 .8rem var(--f-mono);color:var(--muted)}
+.info dl{margin:6px 0 0;display:grid;gap:7px}
+.info dt{font:600 .64rem/1.2 var(--f-mono);letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.info dd{margin:1px 0 0;font-size:.88rem}
+.plist{overflow-y:auto;padding:8px 8px 14px}
+.plist h4{font:600 .66rem/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:12px 8px 4px}
+.plist button{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:6px;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);font:500 .84rem/1.3 var(--f-body);padding:6px 8px;border-radius:6px;cursor:pointer}
+.plist button span:first-child{font:600 .74rem var(--f-mono);color:var(--muted)}
+.plist button span:last-child{font:500 .72rem var(--f-mono);color:var(--muted)}
+.plist button:hover{background:var(--panel2)}
+.plist button[aria-current="true"]{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.plist button[aria-current="true"] span:first-child{color:var(--accent-ink)}
+
+/* embrayage */
+.svgbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+.svgbox svg{min-width:min(460px,100%)}
+.st-ink{stroke:var(--ink)} .fi-ink{fill:var(--ink)} .fi-muted{fill:var(--muted)} .fi-panel{fill:var(--panel)} .fi-accent{fill:var(--accent)}
+.fi-lp{fill:var(--lp)} .fi-hp{fill:var(--hp)} .st-lp{stroke:var(--lp)} .st-hp{stroke:var(--hp)} .st-accent{stroke:var(--accent)} .st-muted{stroke:var(--muted)}
+svg text{font-family:var(--f-body)}
+.flow{fill:none;stroke-width:6;stroke-linecap:round;stroke-dasharray:2 16;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion:reduce){.flow{animation:none}}
+.cstage,.asmstage{position:relative;border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,var(--panel2),var(--panel) 70%)}
+.cstage .stage,.asmstage .stage{aspect-ratio:4/3;max-height:none}
+.cstage canvas,.asmstage canvas{touch-action:pan-y;cursor:grab}
+.clab{position:absolute;pointer-events:none;font:600 .76rem/1.15 var(--f-body);color:var(--ink);background:color-mix(in srgb,var(--panel) 86%,transparent);border:1px solid var(--line2);border-radius:6px;padding:4px 7px;transform:translate(-50%,-50%);white-space:nowrap}
+.clab i{display:block;font-style:italic;font-weight:400;color:var(--muted);font-size:.7rem}
+.clab.hot{border-color:var(--hp);color:var(--hp)}
+/* repères de la vue éclatée */
+.balloons{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.balloons line{stroke:var(--muted);stroke-width:1}
+.balloons circle.b{fill:var(--panel);stroke:var(--ink);stroke-width:1.3;pointer-events:auto;cursor:pointer}
+.balloons circle.d{fill:var(--ink)}
+.balloons text{font:600 10.5px var(--f-mono);fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.balloons g.on circle.b{fill:var(--accent);stroke:var(--accent)}
+.balloons g.on text{fill:#1a1205}
+/* montage */
+.asmgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:32px;align-items:start}
+.asmgrid>*{min-width:0}
+.asmside{position:sticky;top:76px;display:grid;gap:12px}
+.asmhud{position:absolute;left:14px;top:12px;right:14px;display:flex;gap:12px;align-items:baseline;font-size:1.05rem}
+.asmhud .mono{color:var(--accent-ink);font-weight:600}
+.asmhud b{font-family:var(--f-disp);font-weight:700}
+.asm li{cursor:pointer}
+.asm li .n{transition:background .2s,border-color .2s}
+.asm li.done .n{border-color:var(--accent)}
+.asm li.cur .n{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.asm li.cur .row b{color:var(--accent-ink)}
+.asm li.todo{opacity:.5}
+.pv svg text{font:11px var(--f-mono);fill:var(--muted)}
+.dial{display:flex;gap:18px;flex-wrap:wrap}
+.dial div{display:flex;gap:10px;align-items:center;font-size:.86rem}
+.state{font:600 .82rem var(--f-mono);padding:6px 10px;border-radius:6px;background:var(--panel2);border:1px solid var(--line2)}
+.state.on{background:color-mix(in srgb,var(--ok) 18%,var(--panel));border-color:var(--ok)}
+
+/* montage */
+.asm{display:grid;gap:0;counter-reset:a}
+.asm li{list-style:none;cursor:pointer;display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;position:relative;padding-bottom:16px}
+.asm li::before{content:"";position:absolute;left:25px;top:44px;bottom:0;width:2px;background:var(--line2)}
+.asm li:last-child::before{display:none}
+.asm .n{width:52px;height:44px;border-radius:9px;background:var(--panel);border:1.5px solid var(--line2);display:grid;place-items:center;font:700 .95rem var(--f-mono)}
+.asm li.base .n{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.asm .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:9px}
+.asm .row b{font-family:var(--f-disp);font-weight:700;margin-right:6px}
+.chip{font:500 .8rem/1 var(--f-body);padding:6px 9px;border:1px solid var(--line2);border-radius:999px;background:var(--panel)}
+.chip.sub{border-style:dashed}
+.asm ol{margin:0;padding:0}
+
+/* calculs */
+.calc{display:grid;gap:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.fields label{display:grid;gap:4px;font-size:.78rem;color:var(--muted)}
+.fields input,.ftab input{font:500 1rem var(--f-mono);padding:8px 10px;border:1px solid var(--line2);border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+.result{display:flex;flex-wrap:wrap;gap:10px 30px;border-top:1px solid var(--line);padding-top:12px}
+.result .big{font:700 1.8rem/1.05 var(--f-mono);letter-spacing:-.02em}
+.result small{display:block;font-size:.76rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips .chip.hit{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.ftab input{width:92px;padding:5px 7px;font-size:.9rem}
+.chart text{font:11px var(--f-mono);fill:var(--muted)}
+
+/* vidéo */
+.video{border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:#000;aspect-ratio:16/9;max-width:100%}
+.video video{width:100%;height:100%;display:block}
+
+/* quiz */
+.quiz{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.q{display:grid;gap:10px}
+.q .qn{font:600 .72rem var(--f-mono);color:var(--muted);letter-spacing:.1em}
+.q p{font-weight:600}
+.opts{display:grid;gap:6px}
+.opts button{text-align:left;font:500 .9rem/1.3 var(--f-body);padding:9px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--bg);color:var(--ink);cursor:pointer}
+.opts button:hover:not(:disabled){border-color:var(--accent)}
+.opts button.good{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,var(--bg))}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--bg))}
+.opts button:disabled{cursor:default}
+.score{font:700 1.4rem var(--f-mono)}
+.lex td:first-child{font-weight:600}
+.lex td:last-child{color:var(--accent-ink);font-style:italic}
+
+footer{padding-block:40px 60px;color:var(--muted);font-size:.86rem}
+footer .wrap{display:grid;gap:10px}
+.photo{border-radius:12px;background:#fff;padding:10px;border:1px solid var(--line);display:grid;place-items:center}
+.photo img{max-height:340px;width:auto}
+
+@media (max-width:980px){
+  .hero .wrap{grid-template-columns:1fr}
+  .stage{max-height:440px;margin-inline:auto}
+  .viewer{grid-template-columns:1fr}
+  .asmgrid{grid-template-columns:1fr}.asmside{position:relative;top:0}
+  .vside{border-left:0;border-top:1px solid var(--line2);max-height:none}
+  .plist{max-height:320px}
+  .cols{grid-template-columns:1fr}
+  .timeline{grid-template-columns:1fr;gap:18px}
+  .timeline::before{left:6px;right:auto;top:0;bottom:0;width:2px;height:auto}
+  .ev{padding:0 0 0 30px}.ev::before{top:4px}
+  .adv,.quiz{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .specs{grid-template-columns:1fr}.specs div:nth-child(odd){border-right:0}.specs div:nth-last-child(2){border-bottom:1px solid var(--line)}
+  .vmain .stage{height:440px}
+  .brand .full{display:none}
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Accueil">
+      <svg width="26" height="26" viewBox="-13 -13 26 26" aria-hidden="true"><path d="M0 0 C 2 -1 3 2 0 4 C -4 6 -7 1 -5 -3 C -2 -8 6 -8 8 -2 C 10 4 4 10 -2 10" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round"/></svg>
+      <span>SCROLL<span class="full">·C</span></span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#role"><b>01</b><span data-l="fr">Fonction</span><span data-l="en">Function</span></a>
+      <a href="#fonctionnement"><b>02</b><span data-l="fr">Fonctionnement</span><span data-l="en">How it works</span></a>
+      <a href="#eclate"><b>03</b><span data-l="fr">Vue éclatée 3D</span><span data-l="en">3D exploded view</span></a>
+      <a href="#embrayage"><b>04</b><span data-l="fr">Embrayage</span><span data-l="en">Clutch</span></a>
+      <a href="#montage"><b>05</b><span data-l="fr">Montage</span><span data-l="en">Assembly</span></a>
+      <a href="#cinematique"><b>06</b><span data-l="fr">Cinématique</span><span data-l="en">Kinematics</span></a>
+      <a href="#choix"><b>07</b><span data-l="fr">Choix</span><span data-l="en">Design</span></a>
+      <a href="#materiaux"><b>08</b><span data-l="fr">Matériaux</span><span data-l="en">Materials</span></a>
+      <a href="#electro"><b>09</b><span data-l="fr">Électroaimant</span><span data-l="en">Electromagnet</span></a>
+      <a href="#video"><b>10</b><span data-l="fr">Vidéo</span><span data-l="en">Video</span></a>
+      <a href="#quiz"><b>11</b>Quiz</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Langue / Language">
+      <button type="button" id="btnFr" data-set-lang="fr" aria-pressed="true">FR</button>
+      <button type="button" id="btnEn" data-set-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><span data-l="fr">Dossier technique bilingue · SAÉ 1.1 · BUT GMP</span><span data-l="en">Bilingual technical file · SAÉ 1.1 · BUT GMP</span></div>
+      <h1 style="margin-top:14px"><span data-l="fr">Compresseur <em>scroll</em></span><span data-l="en"><em>Scroll</em> compressor</span>
+        <span class="l2"><span data-l="fr">EN · Scroll compressor</span><span data-l="en">FR · Compresseur scroll</span></span></h1>
+      <p class="lead"><span data-l="fr">Le compresseur à spirales de la climatisation automobile. Deux spirales emboîtées compriment le fluide frigorigène sans piston ni clapet d’aspiration ; une poulie débrayable le met en route sur commande.</span><span data-l="en">The spiral compressor of a car air-conditioning system. Two nested spirals compress the refrigerant with no piston and no suction valve; a clutch pulley switches it on when needed.</span></p>
+      <dl class="specs">
+        <div><dt data-l="fr">Fluide</dt><dt data-l="en">Refrigerant</dt><dd>R134a (HFC‑134a)</dd></div>
+        <div><dt data-l="fr">Commande</dt><dt data-l="en">Control</dt><dd><span data-l="fr">Embrayage 12 V</span><span data-l="en">12 V clutch</span></dd></div>
+        <div><dt data-l="fr">Entraînement</dt><dt data-l="en">Drive</dt><dd><span data-l="fr">Courroie poly‑V, 6 gorges</span><span data-l="en">Poly‑V belt, 6 ribs</span></dd></div>
+        <div><dt data-l="fr">Nomenclature CATIA</dt><dt data-l="en">CATIA bill of materials</dt><dd><span data-l="fr">38 références</span><span data-l="en">38 part files</span></dd></div>
+      </dl>
+      <div class="cta">
+        <a class="btn primary" href="#eclate"><span data-l="fr">Ouvrir la vue éclatée</span><span data-l="en">Open the exploded view</span> →</a>
+        <a class="btn" href="#video">▶ <span data-l="fr">Voir la vidéo</span><span data-l="en">Watch the video</span></a>
+      </div>
+    </div>
+    <div class="stage" id="heroStage">
+      <canvas id="hero3d" aria-label="Modèle 3D du compresseur en rotation"></canvas>
+      <div class="hint"><span data-l="fr">Modèle 3D animé · glisser pour tourner</span><span data-l="en">Animated 3D model · drag to rotate</span></div>
+    </div>
+  </div>
+</div>
+
+<main>
+<!-- 01 -->
+<section class="s" id="role"><div class="wrap">
+  <div class="sh"><div class="no">01</div><h2><span data-l="fr">Présentation fonctionnelle</span><span data-l="en">Functional overview</span></h2><div class="other"><span data-l="fr">Functional overview</span><span data-l="en">Présentation fonctionnelle</span></div></div>
+  <div class="cols">
+    <div class="stack">
+      <p><span data-l="fr">Le compresseur est le cœur de la boucle de climatisation. Il aspire le fluide frigorigène gazeux, froid et à basse pression, sortant de l’évaporateur, et le refoule chaud et à haute pression vers le condenseur.</span><span data-l="en">The compressor is the heart of the air-conditioning loop. It draws in cold, low-pressure refrigerant gas from the evaporator and pushes it out hot and at high pressure toward the condenser.</span></p>
+      <p><span data-l="fr">Cette différence de pression permet au fluide de céder sa chaleur à l’air extérieur dans le condenseur, puis, après le détendeur, de prendre la chaleur de l’air de l’habitacle dans l’évaporateur.</span><span data-l="en">This pressure difference lets the refrigerant give off heat to the outside air in the condenser, then, after the expansion valve, absorb heat from the cabin air in the evaporator.</span></p>
+      <p class="note"><span data-l="fr">On l’appelle aussi compresseur à spirales, pompe scroll ou pompe à vide scroll. On le préfère aux compresseurs rotatifs ou alternatifs (à pistons) dans la climatisation des maisons et des voitures.</span><span data-l="en">It is also called a spiral compressor, scroll pump or scroll vacuum pump. It is preferred to rotary or reciprocating (piston) compressors in home and car air conditioning.</span></p>
+      <figure class="card">
+        <svg viewBox="0 0 640 330" role="img" aria-label="Boucle de climatisation">
+          <path class="flow st-hp" d="M150 230 V70 H300"/>
+          <path class="flow st-hp" d="M440 70 H560 V140"/>
+          <path class="flow st-lp" d="M560 200 V280 H420"/>
+          <path class="flow st-lp" d="M290 280 H150 V250"/>
+          <g font-size="15" font-weight="600">
+            <rect x="80" y="180" width="140" height="70" rx="10" class="fi-accent"/>
+            <text x="150" y="211" text-anchor="middle" fill="#1a1205" data-l="fr">Compresseur</text><text x="150" y="211" text-anchor="middle" fill="#1a1205" data-l="en">Compressor</text>
+            <text x="150" y="232" text-anchor="middle" fill="#1a1205" font-size="12" font-weight="500">scroll</text>
+            <rect x="300" y="40" width="140" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
+            <text x="370" y="68" text-anchor="middle" class="fi-ink" data-l="fr">Condenseur</text><text x="370" y="68" text-anchor="middle" class="fi-ink" data-l="en">Condenser</text>
+            <text x="370" y="87" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">cède la chaleur dehors</text><text x="370" y="87" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">rejects heat outside</text>
+            <rect x="500" y="140" width="120" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
+            <text x="560" y="168" text-anchor="middle" class="fi-ink" data-l="fr">Détendeur</text><text x="560" y="168" text-anchor="middle" class="fi-ink" data-l="en">Expansion valve</text>
+            <text x="560" y="187" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">chute de pression</text><text x="560" y="187" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">pressure drop</text>
+            <rect x="290" y="250" width="130" height="60" rx="10" class="fi-panel st-ink" stroke-width="1.5"/>
+            <text x="355" y="278" text-anchor="middle" class="fi-ink" data-l="fr">Évaporateur</text><text x="355" y="278" text-anchor="middle" class="fi-ink" data-l="en">Evaporator</text>
+            <text x="355" y="297" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="fr">refroidit l’habitacle</text><text x="355" y="297" text-anchor="middle" class="fi-muted" font-size="11" font-weight="500" data-l="en">cools the cabin</text>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600">
+            <text x="168" y="130" class="fi-hp" data-l="fr">HP ≈ 15 bar · 80 °C</text><text x="168" y="130" class="fi-hp" data-l="en">HP ≈ 15 bar · 80 °C</text>
+            <text x="168" y="300" class="fi-lp">BP/LP ≈ 2 bar · 5 °C</text>
+          </g>
+        </svg>
+        <figcaption><span data-l="fr">Boucle frigorifique. Rouge : haute pression (refoulement). Bleu : basse pression (aspiration). Valeurs usuelles pour le R134a.</span><span data-l="en">Refrigeration loop. Red: high pressure (discharge). Blue: low pressure (suction). Typical values for R134a.</span></figcaption>
+      </figure>
+    </div>
+    <div class="stack">
+      <figure class="card">
+        <svg viewBox="0 0 520 300" role="img" aria-label="Bête à cornes">
+          <ellipse cx="120" cy="70" rx="100" ry="42" class="fi-panel st-ink" stroke-width="1.5"/>
+          <ellipse cx="400" cy="70" rx="105" ry="42" class="fi-panel st-ink" stroke-width="1.5"/>
+          <ellipse cx="260" cy="170" rx="110" ry="40" class="fi-accent"/>
+          <rect x="70" y="236" width="380" height="50" rx="25" class="fi-panel st-accent" stroke-width="2"/>
+          <path d="M150 108 C 170 170, 210 190, 230 205 M370 108 C 350 170, 310 190, 290 205" fill="none" class="st-ink" stroke-width="2"/>
+          <path d="M260 210 V236" class="st-accent" stroke-width="2"/>
+          <g font-size="13" text-anchor="middle" font-weight="600">
+            <text x="120" y="58" class="fi-muted" font-size="11" data-l="fr">À qui rend-il service ?</text><text x="120" y="58" class="fi-muted" font-size="11" data-l="en">Who does it serve?</text>
+            <text x="120" y="80" class="fi-ink" data-l="fr">Conducteur et passagers</text><text x="120" y="80" class="fi-ink" data-l="en">Driver and passengers</text>
+            <text x="400" y="58" class="fi-muted" font-size="11" data-l="fr">Sur quoi agit-il ?</text><text x="400" y="58" class="fi-muted" font-size="11" data-l="en">What does it act on?</text>
+            <text x="400" y="80" class="fi-ink" data-l="fr">Le fluide frigorigène</text><text x="400" y="80" class="fi-ink" data-l="en">The refrigerant</text>
+            <text x="260" y="176" fill="#1a1205" font-size="16" data-l="fr">Compresseur scroll</text><text x="260" y="176" fill="#1a1205" font-size="16" data-l="en">Scroll compressor</text>
+            <text x="260" y="258" class="fi-muted" font-size="11" data-l="fr">Dans quel but ?</text><text x="260" y="258" class="fi-muted" font-size="11" data-l="en">For what purpose?</text>
+            <text x="260" y="276" class="fi-ink" data-l="fr">Comprimer le fluide pour refroidir l’habitacle</text><text x="260" y="276" class="fi-ink" data-l="en">Compress the refrigerant to cool the cabin</text>
+          </g>
+        </svg>
+        <figcaption><span data-l="fr">Expression du besoin (« bête à cornes »).</span><span data-l="en">Need statement (“horned beast” diagram).</span></figcaption>
+      </figure>
+      <div class="photo"><img src="__PHOTO__" alt="Photo du compresseur scroll étudié en TP" width="360" height="456"></div>
+      <figcaption style="font-size:.84rem;color:var(--muted)"><span data-l="fr">Le compresseur étudié en TP : poulie noire à 6 gorges en haut, corps en aluminium moulé, étiquette HFC134a.</span><span data-l="en">The compressor studied in the lab: black 6-rib pulley on top, cast aluminium body, HFC134a label.</span></figcaption>
+    </div>
+  </div>
+  <div class="tablewrap" style="margin-top:30px">
+    <table class="min640">
+      <thead><tr><th></th><th><span data-l="fr">Fonction</span><span data-l="en">Function</span></th><th><span data-l="fr">Critère · niveau</span><span data-l="en">Criterion · level</span></th></tr></thead>
+      <tbody>
+        <tr><td class="k">FP1</td><td><span data-l="fr">Comprimer le fluide frigorigène et le faire circuler dans la boucle</span><span data-l="en">Compress the refrigerant and circulate it through the loop</span></td><td><span data-l="fr">Refoulement ≈ 15 bar ; débit adapté au besoin de froid</span><span data-l="en">Discharge ≈ 15 bar; flow matched to cooling demand</span></td></tr>
+        <tr><td class="k">FC1</td><td><span data-l="fr">Recevoir la puissance du moteur par la courroie</span><span data-l="en">Take power from the engine through the belt</span></td><td><span data-l="fr">Poulie poly‑V 6 gorges, quelques kW</span><span data-l="en">6-rib poly‑V pulley, a few kW</span></td></tr>
+        <tr><td class="k">FC2</td><td><span data-l="fr">Pouvoir être désaccouplé du moteur sur commande</span><span data-l="en">Disengage from the engine on command</span></td><td><span data-l="fr">Embrayage électromagnétique 12 V</span><span data-l="en">12 V electromagnetic clutch</span></td></tr>
+        <tr><td class="k">FC3</td><td><span data-l="fr">Résister à la pression et à la température du fluide</span><span data-l="en">Withstand refrigerant pressure and temperature</span></td><td><span data-l="fr">&gt; 20 bar, &gt; 100 °C au refoulement</span><span data-l="en">&gt; 20 bar, &gt; 100 °C at discharge</span></td></tr>
+        <tr><td class="k">FC4</td><td><span data-l="fr">Rester étanche au fluide et à l’huile</span><span data-l="en">Stay sealed against refrigerant and oil</span></td><td><span data-l="fr">Compatible R134a et huile PAG ; aucune fuite à l’arbre</span><span data-l="en">R134a and PAG oil compatible; no leak at the shaft</span></td></tr>
+        <tr><td class="k">FC5</td><td><span data-l="fr">Se fixer sur le moteur</span><span data-l="en">Mount on the engine</span></td><td><span data-l="fr">Pattes de fixation, entraxe imposé</span><span data-l="en">Mounting lugs, set centre distance</span></td></tr>
+        <tr><td class="k">FC6</td><td><span data-l="fr">Supporter l’environnement sous le capot</span><span data-l="en">Survive the under-bonnet environment</span></td><td><span data-l="fr">Vibrations, chaleur, eau, sel de route</span><span data-l="en">Vibration, heat, water, road salt</span></td></tr>
+        <tr><td class="k">FC7</td><td><span data-l="fr">Être compact, léger et silencieux</span><span data-l="en">Be compact, light and quiet</span></td><td><span data-l="fr">≈ Ø 115 mm, faible bruit dans l’habitacle</span><span data-l="en">≈ Ø 115 mm, low noise in the cabin</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<!-- 03 -->
+<section class="s" id="fonctionnement"><div class="wrap">
+  <div class="sh"><div class="no">02</div><h2><span data-l="fr">Comprimer en tournant en rond</span><span data-l="en">Compressing in circles</span></h2><div class="other"><span data-l="fr">How it works</span><span data-l="en">Fonctionnement</span></div></div>
+  <div class="cols">
+    <div class="stack">
+      <div class="card" style="padding:14px">
+        <div class="pocket-stage"><canvas id="pockets" width="1040" height="1040" aria-label="Animation des poches de compression"></canvas></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="pPlay" type="button" aria-pressed="true"><span data-l="fr">Pause</span><span data-l="en">Pause</span></button>
+        <label><span data-l="fr">Angle de l’arbre</span><span data-l="en">Shaft angle</span><input type="range" id="pAngle" min="0" max="1080" value="0"><span class="readout" id="pDeg">0°</span></label>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:.84rem;color:var(--muted)">
+        <span style="display:flex;gap:6px;align-items:center"><i style="width:14px;height:14px;border-radius:3px;background:#9aa4ad;display:inline-block"></i><span data-l="fr">Volute fixe</span><span data-l="en">Fixed scroll</span></span>
+        <span style="display:flex;gap:6px;align-items:center"><i style="width:14px;height:14px;border-radius:3px;background:#d9b56d;display:inline-block"></i><span data-l="fr">Volute mobile</span><span data-l="en">Orbiting scroll</span></span>
+        <span class="pressure-key"><span data-l="fr">pression</span><span data-l="en">pressure</span> <i></i></span>
+      </div>
+    </div>
+    <div class="stack">
+      <p><span data-l="fr">Deux spirales identiques sont emboîtées, tournées d’un demi-tour. La <b>volute fixe</b> ne bouge pas. La <b>volute mobile</b>, entraînée par l’excentrique de l’arbre, décrit un petit cercle sans tourner sur elle-même : c’est une <b>translation circulaire</b>.</span><span data-l="en">Two identical spirals are nested, turned half a turn. The <b>fixed scroll</b> stays still. The <b>orbiting scroll</b>, driven by the shaft’s eccentric, moves around a small circle without spinning: this is a <b>circular translation</b>.</span></p>
+      <ol class="steps" id="steps">
+        <li data-step="0"><span class="n">1</span><div><small>Intake</small><b><span data-l="fr">Aspiration</span><span data-l="en">Intake</span></b><br><span data-l="fr">Le gaz basse pression entre par l’orifice d’aspiration, à la périphérie des spirales.</span><span data-l="en">Low-pressure gas enters through the suction port at the outside of the spirals.</span></div></li>
+        <li data-step="1"><span class="n">2</span><div><small>Circular translation motion</small><b><span data-l="fr">Fermeture des poches</span><span data-l="en">Pockets close</span></b><br><span data-l="fr">En orbitant, la volute mobile touche la fixe en deux points et emprisonne des poches en forme de croissant.</span><span data-l="en">As it orbits, the moving scroll touches the fixed one at two points and traps crescent-shaped pockets.</span></div></li>
+        <li data-step="2"><span class="n">3</span><div><small>Compression</small><b>Compression</b><br><span data-l="fr">À chaque tour, les poches avancent vers le centre. Leur volume diminue, leur pression et leur température montent.</span><span data-l="en">With each turn the pockets move toward the centre. Their volume shrinks, so pressure and temperature rise.</span></div></li>
+        <li data-step="3"><span class="n">4</span><div><small>Outlet</small><b><span data-l="fr">Refoulement</span><span data-l="en">Discharge</span></b><br><span data-l="fr">Au centre, le gaz sort par l’orifice de la volute fixe et soulève le clapet anti-retour.</span><span data-l="en">At the centre the gas leaves through the fixed scroll’s port and lifts the non-return valve.</span></div></li>
+      </ol>
+      <figure class="card pv">
+        <svg id="pvChart" viewBox="0 0 520 250" role="img" aria-label="Diagramme pression-volume d’une poche"></svg>
+        <figcaption><span data-l="fr">Cycle suivi par une poche : aspiration à pression constante, compression (le volume diminue, la pression monte), puis refoulement quand la pression dépasse celle du circuit HP. Le point suit l’animation.</span><span data-l="en">Cycle followed by one pocket: suction at constant pressure, compression (volume falls, pressure rises), then discharge once the pressure exceeds the HP line. The dot follows the animation.</span></figcaption>
+      </figure>
+      <p style="font-size:.9rem;color:var(--muted)"><span data-l="fr">Les spirales sont des développantes de cercle : l’écart entre deux spires est constant. Le rayon d’orbite vaut le demi-pas moins l’épaisseur de paroi, ce qui garde les spirales en contact. Les poches de l’animation sont calculées à chaque image.</span><span data-l="en">The spirals are involutes of a circle, so the gap between turns is constant. The orbit radius equals half the pitch minus the wall thickness, which keeps the spirals in contact. The pockets in the animation are computed every frame.</span></p>
+    </div>
+  </div>
+  <div class="adv">
+    <div class="card"><h3><span style="color:var(--lp)">≋</span><span data-l="fr">Compression continue</span><span data-l="en">Continuous compression</span></h3><p><span data-l="fr">Plusieurs poches sont comprimées en même temps : le débit est régulier, sans pulsations comme avec un piston.</span><span data-l="en">Several pockets are compressed at once, so flow is smooth, without the pulses of a piston.</span></p></div>
+    <div class="card"><h3><span style="color:var(--mid)">◌</span><span data-l="fr">Moins de bruit</span><span data-l="en">Lower noise levels</span></h3><p><span data-l="fr">Peu de pièces en mouvement et un couple régulier : moins de vibrations, fonctionnement plus silencieux.</span><span data-l="en">Few moving parts and steady torque mean less vibration and quieter operation.</span></p></div>
+    <div class="card"><h3><span style="color:var(--hp)">↗</span><span data-l="fr">Meilleur rendement</span><span data-l="en">Increased efficiency</span></h3><p><span data-l="fr">Pas de clapet d’aspiration ni d’espace mort : la compression régulière limite les pertes d’énergie.</span><span data-l="en">No suction valve and no dead volume: the steady compression minimises energy losses.</span></p></div>
+  </div>
+</div></section>
+
+<!-- 04 -->
+<section class="s" id="eclate"><div class="wrap">
+  <div class="sh"><div class="no">03</div><h2><span data-l="fr">Vue éclatée 3D et nomenclature</span><span data-l="en">3D exploded view and parts list</span></h2><div class="other"><span data-l="fr">3D exploded view</span><span data-l="en">Vue éclatée 3D</span></div></div>
+  <div class="viewer">
+    <div class="vmain">
+      <div class="stage"><canvas id="view3d" tabindex="0" aria-label="Vue éclatée 3D interactive"></canvas></div>
+      <div class="vbar">
+        <button class="btn" type="button" id="vRun" aria-pressed="false">▶ <span data-l="fr">Faire tourner</span><span data-l="en">Run</span></button>
+        <button class="btn" type="button" id="vCut" aria-pressed="false">◧ <span data-l="fr">Coupe</span><span data-l="en">Section</span></button>
+        <button class="btn" type="button" id="vIso" aria-pressed="false">◎ <span data-l="fr">Isoler</span><span data-l="en">Isolate</span></button>
+        <button class="btn" type="button" id="vCoil" aria-pressed="true">⚡ <span data-l="fr">Bobine 12 V</span><span data-l="en">Coil 12 V</span></button>
+        <button class="btn" type="button" id="vBal" aria-pressed="true">① <span data-l="fr">Repères</span><span data-l="en">Balloons</span></button>
+        <button class="btn" type="button" id="vReset">⟲ <span data-l="fr">Vue</span><span data-l="en">View</span></button>
+      </div>
+      <svg class="balloons" id="vBalloons" aria-hidden="true"></svg>
+      <div class="vexp"><span data-l="fr">Assemblé</span><span data-l="en">Assembled</span><input type="range" id="vExplode" min="0" max="100" value="100" aria-label="Éclatement"><span data-l="fr">Éclaté</span><span data-l="en">Exploded</span></div>
+      <div class="tip" id="vTip" hidden></div>
+      <div class="callout" id="vCall" hidden></div>
+    </div>
+    <aside class="vside">
+      <div class="info" id="vInfo" aria-live="polite"></div>
+      <div class="plist" id="vList"></div>
+    </aside>
+  </div>
+  <p style="margin-top:14px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Cliquez une pièce (ou son nom) pour voir sa fonction, son matériau et son procédé d’obtention. Molette ou pincement pour zoomer, clic droit ou deux doigts pour déplacer. Modèle redessiné d’après les fichiers CATIA du TP, dans l’ordre de l’éclaté linéaire ; formes simplifiées, couleurs pédagogiques (volute mobile en doré).</span><span data-l="en">Click a part (or its name) to see its function, material and manufacturing process. Wheel or pinch to zoom, right-click or two fingers to pan. Model redrawn from the lab’s CATIA files, in the order of the linear exploded view; simplified shapes, teaching colours (orbiting scroll in gold).</span></p>
+</div></section>
+
+<!-- 05 -->
+<section class="s" id="embrayage"><div class="wrap">
+  <div class="sh"><div class="no">04</div><h2><span data-l="fr">La poulie débrayable</span><span data-l="en">The clutch pulley</span></h2><div class="other"><span data-l="fr">Electromagnetic clutch</span><span data-l="en">Embrayage électromagnétique</span></div></div>
+  <div class="cols">
+    <div class="stack">
+      <div class="cstage">
+        <div class="stage"><canvas id="clutch3d" aria-label="Coupe 3D de l'embrayage électromagnétique"></canvas></div>
+        <div id="cLabels"></div>
+        <div class="hint"><span data-l="fr">Coupe 3D · glisser pour tourner</span><span data-l="en">3D section · drag to rotate</span></div>
+      </div>
+      <div class="controls">
+        <button class="btn" type="button" id="coilBtn" aria-pressed="true">⚡ <span data-l="fr">Bobine alimentée (12 V)</span><span data-l="en">Coil powered (12 V)</span></button>
+        <span class="state on" id="coilState"></span>
+      </div>
+      <div class="dial">
+        <div><svg width="40" height="40" viewBox="-20 -20 40 40"><circle r="17" class="fi-panel st-ink" stroke-width="1.5"/><line id="dialP" x1="0" y1="0" x2="0" y2="-15" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/></svg><span><span data-l="fr">Poulie : tourne toujours</span><span data-l="en">Pulley: always turning</span></span></div>
+        <div><svg width="40" height="40" viewBox="-20 -20 40 40"><circle r="17" class="fi-panel st-ink" stroke-width="1.5"/><line id="dialS" x1="0" y1="0" x2="0" y2="-15" stroke="var(--lp)" stroke-width="3" stroke-linecap="round"/></svg><span><span data-l="fr">Arbre du compresseur</span><span data-l="en">Compressor shaft</span></span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <p><b><span data-l="fr">Rôle :</span><span data-l="en">Role:</span></b> <span data-l="fr">transmettre ou couper le mouvement entre la courroie du moteur et l’arbre du compresseur, sur commande électrique du calculateur de climatisation.</span><span data-l="en">transmit or cut the drive between the engine belt and the compressor shaft, on an electrical command from the A/C control unit.</span></p>
+      <ol class="steps">
+        <li><span class="n">1</span><div><span data-l="fr">La poulie tourne en permanence avec la courroie, sur son propre roulement monté sur le nez du corps. Elle ne touche pas l’arbre.</span><span data-l="en">The pulley turns all the time with the belt, on its own bearing on the housing nose. It does not touch the shaft.</span></div></li>
+        <li><span class="n">2</span><div><span data-l="fr">Le plateau est fixé sur l’arbre par l’écrou. Des lames-ressorts le tiennent écarté de la poulie : il reste un petit entrefer.</span><span data-l="en">The plate is fixed to the shaft by the nut. Leaf springs hold it away from the pulley, leaving a small air gap.</span></div></li>
+        <li><span class="n">3</span><div><span data-l="fr">Bobine alimentée : le champ magnétique passe par la poulie et attire le plateau, qui se colle à la poulie. Par adhérence, la poulie entraîne le plateau, donc l’arbre.</span><span data-l="en">Coil on: the magnetic field runs through the pulley and pulls the plate against it. Friction makes the pulley drive the plate, and so the shaft.</span></div></li>
+        <li><span class="n">4</span><div><span data-l="fr">Bobine coupée : les lames-ressorts ramènent le plateau, l’entrefer se rouvre et l’arbre s’arrête.</span><span data-l="en">Coil off: the leaf springs pull the plate back, the gap reopens and the shaft stops.</span></div></li>
+      </ol>
+      <p class="note"><span data-l="fr">Pourquoi débrayable ? Pour ne pas consommer de puissance moteur quand la climatisation est coupée, pour réguler la température par cycles marche/arrêt, et pour protéger le circuit (le capteur de température coupe la bobine en cas de surchauffe).</span><span data-l="en">Why a clutch? So the compressor uses no engine power when the A/C is off, so temperature can be regulated by on/off cycling, and to protect the system (the temperature sensor cuts the coil if it overheats).</span></p>
+    </div>
+  </div>
+</div></section>
+
+<!-- 06 -->
+<section class="s" id="montage"><div class="wrap">
+  <div class="sh"><div class="no">05</div><h2><span data-l="fr">Graphe de montage</span><span data-l="en">Assembly chart</span></h2><div class="other"><span data-l="fr">Assembly sequence</span><span data-l="en">Ordre d’assemblage</span></div></div>
+  <div class="asmgrid">
+    <div class="asmside">
+      <div class="asmstage">
+        <div class="stage"><canvas id="asm3d" aria-label="Montage animé du compresseur, étape par étape"></canvas></div>
+        <div class="asmhud"><span class="mono" id="aStepNo">01 / 13</span><b id="aStepName"></b></div>
+      </div>
+      <div class="controls">
+        <button class="btn" type="button" id="aPrev" aria-label="Étape précédente">◀</button>
+        <button class="btn primary" type="button" id="aPlay" aria-pressed="false"></button>
+        <button class="btn" type="button" id="aNext" aria-label="Étape suivante">▶</button>
+        <button class="btn" type="button" id="aRev" aria-pressed="false">⇄ <span data-l="fr">Démontage</span><span data-l="en">Disassembly</span></button>
+      </div>
+    </div>
+    <ol class="asm" id="asm"></ol>
+  </div>
+  <div class="cols" style="margin-top:28px">
+    <div class="stack">
+      <p><span data-l="fr">Le montage part du <b>corps</b>, pièce de référence qui porte toutes les autres. On y monte l’arbre et son roulement, puis le dispositif anti-rotation, la volute mobile, la volute fixe et le couvercle, serrés par les 4 vis M8. L’embrayage se monte en dernier, par l’avant.</span><span data-l="en">Assembly starts from the <b>housing</b>, the reference part that carries all the others. The shaft and its bearing go in first, then the anti-rotation device, the orbiting scroll, the fixed scroll and the rear head, clamped by the 4 M8 bolts. The clutch goes on last, from the front.</span></p>
+      <p class="note"><span data-l="fr">À l’étape 12, l’entrefer entre plateau et poulie se règle avec la grande rondelle (cale) avant de serrer l’écrou M8. Ordre à vérifier en démontant en sens inverse pendant le TP.</span><span data-l="en">At step 12 the plate-to-pulley air gap is set with the shim washer before tightening the M8 nut. Check the order by disassembling in reverse during the lab.</span></p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:.84rem;color:var(--muted);align-items:center"><span class="chip"><span data-l="fr">pièce</span><span data-l="en">part</span></span><span data-l="fr">pièce ajoutée</span><span data-l="en">part added</span><span class="chip sub"><span data-l="fr">sous-ensemble</span><span data-l="en">sub-assembly</span></span><span data-l="fr">pré-assemblé avant montage</span><span data-l="en">pre-assembled first</span></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 07 -->
+<section class="s" id="cinematique"><div class="wrap">
+  <div class="sh"><div class="no">06</div><h2><span data-l="fr">Schéma cinématique</span><span data-l="en">Kinematic diagram</span></h2><div class="other"><span data-l="fr">Kinematic diagram</span><span data-l="en">Schéma cinématique</span></div></div>
+  <div class="cols">
+    <figure class="svgbox">
+      <svg viewBox="0 0 600 360" role="img" aria-label="Schéma cinématique minimal">
+        <defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="var(--ink)" stroke-width="1.4"/></pattern></defs>
+        <line x1="30" y1="200" x2="580" y2="200" class="st-muted" stroke-dasharray="16 4 3 4"/>
+        <!-- S0 bâti -->
+        <g><rect x="250" y="292" width="120" height="12" fill="url(#hatch)"/><line x1="250" y1="292" x2="370" y2="292" class="st-ink" stroke-width="2"/>
+          <path d="M310 292 V236" class="st-ink" stroke-width="2.5"/>
+          <rect x="285" y="186" width="50" height="28" fill="var(--panel)" class="st-ink" stroke-width="2.5"/>
+          <path d="M285 180 H335 M285 220 H335" class="st-ink" stroke-width="2.5"/><path d="M310 220 V236" class="st-ink" stroke-width="2.5"/>
+          <text x="310" y="324" text-anchor="middle" class="fi-ink" font-size="13" font-weight="700" font-family="IBM Plex Mono">S0</text>
+          <text x="345" y="248" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L1</text></g>
+        <!-- S1 arbre -->
+        <path d="M120 200 H520" stroke="var(--accent)" stroke-width="4"/>
+        <path d="M120 200 V150 H150" stroke="var(--accent)" stroke-width="4" fill="none"/>
+        <text x="420" y="190" font-size="13" font-weight="700" fill="var(--accent-ink)" font-family="IBM Plex Mono">S1</text>
+        <text x="100" y="178" font-size="11" class="fi-muted" font-family="IBM Plex Mono">e</text>
+        <path d="M108 200 V150" class="st-muted" stroke-width="1"/><path d="M104 200 h8 M104 150 h8" class="st-muted"/>
+        <!-- L2 pivot excentré -->
+        <rect x="150" y="137" width="40" height="26" fill="var(--panel)" stroke="var(--lp)" stroke-width="2.5"/>
+        <path d="M150 131 H190 M150 169 H190" stroke="var(--lp)" stroke-width="2.5"/>
+        <text x="156" y="126" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L2</text>
+        <!-- S2 volute mobile -->
+        <path d="M60 60 V260 M60 150 H150" stroke="var(--lp)" stroke-width="4" fill="none"/>
+        <text x="40" y="56" font-size="13" font-weight="700" fill="var(--lp)" font-family="IBM Plex Mono">S2</text>
+        <!-- S3 Oldham / billes, L3 L4 glissières -->
+        <rect x="36" y="268" width="48" height="26" fill="var(--panel)" stroke="var(--lp)" stroke-width="2.5"/>
+        <path d="M60 260 V268" stroke="var(--lp)" stroke-width="2.5"/>
+        <path d="M30 294 H90" stroke="#b3924f" stroke-width="4"/>
+        <text x="96" y="286" font-size="12" class="fi-muted" font-family="IBM Plex Mono">L4 (z)</text>
+        <rect x="46" y="306" width="28" height="22" fill="var(--panel)" stroke="#b3924f" stroke-width="2.5"/>
+        <path d="M30 306 V328 M90 306 V328" stroke="#b3924f" stroke-width="2.5"/>
+        <path d="M60 328 V340" class="st-ink" stroke-width="2.5"/><rect x="40" y="340" width="40" height="8" fill="url(#hatch)"/>
+        <text x="96" y="324" font-size="12" class="fi-muted" font-family="IBM Plex Mono">L3 (y)</text>
+        <text x="8" y="300" font-size="13" font-weight="700" fill="#b3924f" font-family="IBM Plex Mono">S3</text>
+        <!-- S4 poulie, L5 pivot, L6 embrayage -->
+        <path d="M455 120 V280" stroke="var(--mid)" stroke-width="4"/>
+        <path d="M455 120 H480 M455 280 H480" stroke="var(--mid)" stroke-width="4"/>
+        <text x="462" y="110" font-size="13" font-weight="700" fill="var(--mid)" font-family="IBM Plex Mono">S4</text>
+        <rect x="430" y="232" width="50" height="24" fill="var(--panel)" stroke="var(--mid)" stroke-width="2.5"/>
+        <path d="M430 226 H480 M430 262 H480" stroke="var(--mid)" stroke-width="2.5"/>
+        <text x="486" y="252" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L5</text>
+        <path d="M500 160 V240 M512 160 V240" stroke-width="5" stroke="var(--accent)"/><path d="M480 200 H500" stroke="var(--mid)" stroke-width="4"/>
+        <text x="520" y="160" class="fi-muted" font-size="12" font-family="IBM Plex Mono">L6</text>
+      </svg>
+      <figcaption><span data-l="fr">Schéma minimal (vue de côté, axe x horizontal). S2 ne peut que translater grâce aux deux glissières perpendiculaires L3 et L4 : son mouvement par rapport à S0 est une translation circulaire de rayon e.</span><span data-l="en">Minimal diagram (side view, x axis horizontal). S2 can only translate because of the two perpendicular slides L3 and L4: its motion relative to S0 is a circular translation of radius e.</span></figcaption>
+    </figure>
+    <div class="stack">
+      <div class="tablewrap"><table>
+        <thead><tr><th><span data-l="fr">Classe</span><span data-l="en">Group</span></th><th><span data-l="fr">Pièces</span><span data-l="en">Parts</span></th></tr></thead>
+        <tbody>
+          <tr><td class="k">S0</td><td><span data-l="fr">Bâti : corps, couvercle, volute fixe, bobine, feuille VF, joints, vis</span><span data-l="en">Frame: housing, rear head, fixed scroll, coil, fixed thrust plate, seals, screws</span></td></tr>
+          <tr><td class="k" style="color:var(--accent-ink)">S1</td><td><span data-l="fr">Axe excentrique, masse d’inertie, plateau d’embrayage, rondelle, écrou</span><span data-l="en">Eccentric shaft, counterweight, clutch plate, washer, nut</span></td></tr>
+          <tr><td class="k" style="color:var(--lp)">S2</td><td><span data-l="fr">Volute mobile, feuille VM, roulement d’excentrique</span><span data-l="en">Orbiting scroll, orbiting thrust plate, crank bearing</span></td></tr>
+          <tr><td class="k" style="color:#b3924f">S3</td><td><span data-l="fr">Billes et rond guide-billes (modélisés par une bague d’Oldham)</span><span data-l="en">Balls and retainer (modelled as an Oldham coupling)</span></td></tr>
+          <tr><td class="k" style="color:var(--mid)">S4</td><td><span data-l="fr">Poulie</span><span data-l="en">Pulley</span></td></tr>
+        </tbody></table></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th></th><th><span data-l="fr">Entre</span><span data-l="en">Between</span></th><th><span data-l="fr">Liaison</span><span data-l="en">Joint</span></th></tr></thead>
+        <tbody>
+          <tr><td class="k">L1</td><td class="mono">S1/S0</td><td><span data-l="fr">Pivot d’axe (O, x) : roulements de l’arbre</span><span data-l="en">Revolute (O, x): shaft bearings</span></td></tr>
+          <tr><td class="k">L2</td><td class="mono">S2/S1</td><td><span data-l="fr">Pivot d’axe (A, x), A décalé de e</span><span data-l="en">Revolute (A, x), A offset by e</span></td></tr>
+          <tr><td class="k">L3</td><td class="mono">S3/S0</td><td><span data-l="fr">Glissière de direction y</span><span data-l="en">Prismatic along y</span></td></tr>
+          <tr><td class="k">L4</td><td class="mono">S2/S3</td><td><span data-l="fr">Glissière de direction z</span><span data-l="en">Prismatic along z</span></td></tr>
+          <tr><td class="k">L5</td><td class="mono">S4/S0</td><td><span data-l="fr">Pivot d’axe (O, x) : roulement de poulie</span><span data-l="en">Revolute (O, x): pulley bearing</span></td></tr>
+          <tr><td class="k">L6</td><td class="mono">S4/S1</td><td><span data-l="fr">Embrayage : encastrement si bobine alimentée, aucune liaison sinon</span><span data-l="en">Clutch: rigid if the coil is powered, no joint otherwise</span></td></tr>
+        </tbody></table></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 08 -->
+<section class="s" id="choix"><div class="wrap">
+  <div class="sh"><div class="no">07</div><h2><span data-l="fr">Justification des choix techniques</span><span data-l="en">Why these design choices</span></h2><div class="other"><span data-l="fr">Design choices</span><span data-l="en">Choix techniques</span></div></div>
+  <div class="tablewrap"><table class="min640">
+    <thead><tr><th><span data-l="fr">Choix</span><span data-l="en">Choice</span></th><th><span data-l="fr">Justification</span><span data-l="en">Reason</span></th><th><span data-l="fr">Fonction</span><span data-l="en">Function</span></th></tr></thead>
+    <tbody>
+      <tr><td><b><span data-l="fr">Spirales plutôt que pistons</span><span data-l="en">Scrolls instead of pistons</span></b></td><td><span data-l="fr">Peu de pièces mobiles, pas de clapet d’aspiration, plusieurs poches comprimées à la fois : meilleur rendement, couple régulier, moins de bruit.</span><span data-l="en">Few moving parts, no suction valve, several pockets compressed at once: better efficiency, steady torque, less noise.</span></td><td class="k">FP1 FC7</td></tr>
+      <tr><td><b><span data-l="fr">Embrayage électromagnétique</span><span data-l="en">Electromagnetic clutch</span></b></td><td><span data-l="fr">Arrêt du compresseur sans arrêter le moteur, commande simple par le calculateur, économie de carburant.</span><span data-l="en">Stops the compressor without stopping the engine, simple control by the ECU, saves fuel.</span></td><td class="k">FC2</td></tr>
+      <tr><td><b><span data-l="fr">Poulie poly‑V</span><span data-l="en">Poly‑V pulley</span></b></td><td><span data-l="fr">Plusieurs petites gorges : grande surface d’adhérence pour un petit diamètre, donc un faible encombrement.</span><span data-l="en">Several small ribs give a large grip area on a small diameter, so the unit stays compact.</span></td><td class="k">FC1 FC7</td></tr>
+      <tr><td><b><span data-l="fr">Carters en aluminium moulé</span><span data-l="en">Cast aluminium housings</span></b></td><td><span data-l="fr">Masse volumique faible (≈ 2,7 g/cm³), formes complexes obtenues directement en fonderie, bonne conduction thermique, bonne tenue à la corrosion.</span><span data-l="en">Low density (≈ 2.7 g/cm³), complex shapes straight from the mould, good heat conduction and corrosion resistance.</span></td><td class="k">FC3 FC6 FC7</td></tr>
+      <tr><td><b><span data-l="fr">Spirales en aluminium-silicium</span><span data-l="en">Aluminium-silicon scrolls</span></b></td><td><span data-l="fr">Volute mobile légère : faibles efforts d’inertie. Le silicium améliore la résistance à l’usure. Dilatation proche de celle du corps.</span><span data-l="en">Light orbiting scroll means low inertia forces. Silicon improves wear resistance. Thermal expansion close to the housing’s.</span></td><td class="k">FP1 FC7</td></tr>
+      <tr><td><b><span data-l="fr">Billes anti-rotation et contrepoids</span><span data-l="en">Anti-rotation balls and counterweight</span></b></td><td><span data-l="fr">Les billes empêchent la volute mobile de tourner sur elle-même (sinon aucune poche ne se forme) avec très peu de frottement. Le contrepoids équilibre la masse excentrée.</span><span data-l="en">The balls stop the orbiting scroll from spinning (otherwise no pocket forms) with very little friction. The counterweight balances the off-centre mass.</span></td><td class="k">FP1 FC6</td></tr>
+      <tr><td><b><span data-l="fr">Arbre en acier allié traité</span><span data-l="en">Heat-treated alloy steel shaft</span></b></td><td><span data-l="fr">Résistance à la torsion et à la fatigue, portées dures pour les roulements.</span><span data-l="en">Strength in torsion and fatigue, hard seats for the bearings.</span></td><td class="k">FC1</td></tr>
+      <tr><td><b><span data-l="fr">Joints HNBR et joint à lèvre</span><span data-l="en">HNBR seals and lip seal</span></b></td><td><span data-l="fr">Compatibles avec le R134a et l’huile PAG ; ils gardent le circuit étanche malgré la pression.</span><span data-l="en">Compatible with R134a and PAG oil; they keep the circuit sealed under pressure.</span></td><td class="k">FC4</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<!-- 09 -->
+<section class="s" id="materiaux"><div class="wrap">
+  <div class="sh"><div class="no">08</div><h2><span data-l="fr">Identifier un matériau par sa masse volumique</span><span data-l="en">Identifying a material by its density</span></h2><div class="other"><span data-l="fr">Materials</span><span data-l="en">Matériaux</span></div></div>
+  <div class="cols">
+    <div class="stack">
+      <p><span data-l="fr">Les alliages métalliques se distinguent bien par leur masse volumique ρ = m / V. La masse se mesure à la balance de précision ; le volume d’une pièce de forme complexe, par déplacement d’eau dans un bécher gradué.</span><span data-l="en">Metal alloys are easy to tell apart by their density ρ = m / V. Mass is measured on a precision balance; the volume of a complex part by water displacement in a graduated beaker.</span></p>
+      <ol class="steps">
+        <li><span class="n">1</span><div><span data-l="fr">Peser la pièce sèche : masse <i>m</i>.</span><span data-l="en">Weigh the dry part: mass <i>m</i>.</span></div></li>
+        <li><span class="n">2</span><div><span data-l="fr">Remplir le bécher et lire le volume <i>V₁</i>.</span><span data-l="en">Fill the beaker and read the volume <i>V₁</i>.</span></div></li>
+        <li><span class="n">3</span><div><span data-l="fr">Plonger entièrement la pièce sans bulle, lire <i>V₂</i>. Alors V = V₂ − V₁.</span><span data-l="en">Fully immerse the part with no air bubble, read <i>V₂</i>. Then V = V₂ − V₁.</span></div></li>
+        <li><span class="n">4</span><div><span data-l="fr">Comparer ρ aux bases de données (CES Selector, matweb.com), puis relever les propriétés qui justifient le choix.</span><span data-l="en">Compare ρ with databases (CES Selector, matweb.com), then note the properties that justify the choice.</span></div></li>
+      </ol>
+    </div>
+    <div class="card calc">
+      <span class="tag"><span data-l="fr">Exemple · remplacez par vos mesures</span><span data-l="en">Example · enter your own readings</span></span>
+      <div class="fields">
+        <label for="dM"><span data-l="fr">Masse m (g)</span><span data-l="en">Mass m (g)</span><input id="dM" type="number" step="0.1" value="245.0"></label>
+        <label for="dV1">V₁ (mL)<input id="dV1" type="number" step="1" value="300"></label>
+        <label for="dV2">V₂ (mL)<input id="dV2" type="number" step="1" value="390"></label>
+        <label for="dE"><span data-l="fr">± lecture (mL)</span><span data-l="en">± reading (mL)</span><input id="dE" type="number" step="0.5" value="2"></label>
+      </div>
+      <div class="result">
+        <div><small><span data-l="fr">Masse volumique</span><span data-l="en">Density</span></small><span class="big" id="dRho">–</span></div>
+        <div><small><span data-l="fr">Incertitude</span><span data-l="en">Uncertainty</span></small><span class="big" id="dU" style="font-size:1.2rem">–</span></div>
+      </div>
+      <div class="chips" id="dChips"></div>
+      <p style="font-size:.8rem;color:var(--muted)">Δρ/ρ ≈ Δm/m + 2·ΔV/V</p>
+    </div>
+  </div>
+  <div class="tablewrap" style="margin-top:28px"><table class="min640">
+    <thead><tr><th><span data-l="fr">Matériau</span><span data-l="en">Material</span></th><th><span data-l="fr">Pièces</span><span data-l="en">Parts</span></th><th>ρ (g/cm³)</th><th>E (GPa)</th><th><span data-l="fr">Résistance</span><span data-l="en">Strength</span></th><th><span data-l="fr">Propriété clé</span><span data-l="en">Key property</span></th></tr></thead>
+    <tbody>
+      <tr><td><b>AlSi9Cu3</b></td><td><span data-l="fr">Corps, couvercle</span><span data-l="en">Housing, rear head</span></td><td class="mono">2,76</td><td class="mono">75</td><td class="mono">Rm ≈ 240 MPa</td><td><span data-l="fr">Coulabilité, λ ≈ 110 W·m⁻¹·K⁻¹</span><span data-l="en">Castability, λ ≈ 110 W·m⁻¹·K⁻¹</span></td></tr>
+      <tr><td><b>Al‑Si 17 % (A390)</b></td><td><span data-l="fr">Volutes</span><span data-l="en">Scrolls</span></td><td class="mono">2,73</td><td class="mono">81</td><td class="mono">Rm ≈ 280 MPa</td><td><span data-l="fr">Résistance à l’usure, α ≈ 18 µm·m⁻¹·K⁻¹</span><span data-l="en">Wear resistance, α ≈ 18 µm·m⁻¹·K⁻¹</span></td></tr>
+      <tr><td><b>42CrMo4</b></td><td><span data-l="fr">Axe excentrique</span><span data-l="en">Eccentric shaft</span></td><td class="mono">7,85</td><td class="mono">210</td><td class="mono">Re ≈ 650–900 MPa</td><td><span data-l="fr">Tenue en fatigue et torsion</span><span data-l="en">Fatigue and torsion strength</span></td></tr>
+      <tr><td><b>100Cr6</b></td><td><span data-l="fr">Roulements, billes</span><span data-l="en">Bearings, balls</span></td><td class="mono">7,81</td><td class="mono">210</td><td class="mono">60–64 HRC</td><td><span data-l="fr">Dureté, résistance au contact</span><span data-l="en">Hardness, contact fatigue</span></td></tr>
+      <tr><td><b><span data-l="fr">Acier doux</span><span data-l="en">Low-carbon steel</span></b></td><td><span data-l="fr">Poulie, plateau, carcasse de bobine</span><span data-l="en">Pulley, plate, coil shell</span></td><td class="mono">7,85</td><td class="mono">210</td><td class="mono">Re ≈ 235 MPa</td><td><span data-l="fr">Perméabilité magnétique élevée</span><span data-l="en">High magnetic permeability</span></td></tr>
+      <tr><td><b><span data-l="fr">Cuivre Cu‑ETP</span><span data-l="en">Cu‑ETP copper</span></b></td><td><span data-l="fr">Bobinage</span><span data-l="en">Coil winding</span></td><td class="mono">8,94</td><td class="mono">117</td><td class="mono">—</td><td><span data-l="fr">Résistivité 1,72·10⁻⁸ Ω·m</span><span data-l="en">Resistivity 1.72·10⁻⁸ Ω·m</span></td></tr>
+      <tr><td><b>HNBR</b></td><td><span data-l="fr">Joints</span><span data-l="en">Seals</span></td><td class="mono">≈ 1,25</td><td class="mono">—</td><td class="mono">−40…+150 °C</td><td><span data-l="fr">Compatible R134a et huile PAG</span><span data-l="en">Compatible with R134a and PAG oil</span></td></tr>
+    </tbody></table></div>
+  <p style="margin-top:10px;font-size:.82rem;color:var(--muted)"><span data-l="fr">Valeurs typiques (CES Selector, MatWeb). Les matériaux sont des hypothèses à confirmer par vos mesures de masse volumique.</span><span data-l="en">Typical values (CES Selector, MatWeb). Materials are assumptions to be confirmed by your density measurements.</span></p>
+</div></section>
+
+<!-- 10 -->
+<section class="s" id="electro"><div class="wrap">
+  <div class="sh"><div class="no">09</div><h2><span data-l="fr">L’électroaimant en chiffres</span><span data-l="en">The electromagnet in numbers</span></h2><div class="other"><span data-l="fr">Electromagnet study</span><span data-l="en">Étude de l’électroaimant</span></div></div>
+  <div class="cols">
+    <div class="stack">
+      <p><b><span data-l="fr">Résistance et puissance.</span><span data-l="en">Resistance and power.</span></b> <span data-l="fr">En régime permanent, la bobine se comporte comme une résistance : R = U / I et P = U·I = U² / R.</span><span data-l="en">In steady state the coil behaves like a resistor: R = U / I and P = U·I = U² / R.</span></p>
+      <p><b><span data-l="fr">Force d’arrachement.</span><span data-l="en">Pull-off force.</span></b> <span data-l="fr">Pour chaque tension, on mesure la force F nécessaire pour décoller le plateau. Tant que le fer n’est pas saturé, F croît à peu près comme I², donc comme U².</span><span data-l="en">For each voltage, measure the force F needed to pull the plate off. Until the iron saturates, F grows roughly as I², so as U².</span></p>
+      <p><b><span data-l="fr">Couple transmissible.</span><span data-l="en">Transmissible torque.</span></b> <span data-l="fr">Le plateau est entraîné par frottement sur une couronne de rayons R₁ et R₂ : C = f · F · Rₘ, avec Rₘ = (R₁ + R₂) / 2.</span><span data-l="en">The plate is driven by friction on a ring of radii R₁ and R₂: C = f · F · Rₘ, with Rₘ = (R₁ + R₂) / 2.</span></p>
+      <div class="card calc">
+        <span class="tag"><span data-l="fr">Exemple · remplacez par vos mesures</span><span data-l="en">Example · enter your own readings</span></span>
+        <div class="fields">
+          <label for="eU">U (V)<input id="eU" type="number" step="0.1" value="12"></label>
+          <label for="eI">I (A)<input id="eI" type="number" step="0.01" value="3.6"></label>
+          <label for="eF">f<input id="eF" type="number" step="0.01" value="0.3"></label>
+          <label for="eR1">R₁ (mm)<input id="eR1" type="number" step="1" value="35"></label>
+          <label for="eR2">R₂ (mm)<input id="eR2" type="number" step="1" value="50"></label>
+        </div>
+        <div class="result">
+          <div><small><span data-l="fr">Résistance</span><span data-l="en">Resistance</span></small><span class="big" id="eRes">–</span></div>
+          <div><small><span data-l="fr">Puissance</span><span data-l="en">Power</span></small><span class="big" id="ePow">–</span></div>
+          <div><small><span data-l="fr">Couple max à U</span><span data-l="en">Max torque at U</span></small><span class="big" id="eTq">–</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="tablewrap"><table class="ftab">
+        <thead><tr><th>U (V)</th><th><span data-l="fr">F mesurée (N)</span><span data-l="en">Measured F (N)</span></th><th><span data-l="fr">Couple C (N·m)</span><span data-l="en">Torque C (N·m)</span></th></tr></thead>
+        <tbody id="fBody"></tbody></table></div>
+      <figure class="card"><svg id="fChart" class="chart" viewBox="0 0 480 280" role="img" aria-label="Force en fonction de la tension"></svg>
+        <figcaption><span data-l="fr">F(U) mesurée (points) et loi en U² ajustée sur les premiers points (tirets). L’écart à forte tension montre la saturation du circuit magnétique.</span><span data-l="en">Measured F(U) (dots) and a U² law fitted to the first points (dashed). The gap at high voltage shows magnetic saturation.</span></figcaption></figure>
+    </div>
+  </div>
+</div></section>
+
+<!-- 11 -->
+<section class="s" id="video"><div class="wrap">
+  <div class="sh"><div class="no">10</div><h2><span data-l="fr">Le film du compresseur</span><span data-l="en">The compressor film</span></h2><div class="other"><span data-l="fr">Video</span><span data-l="en">Vidéo</span></div></div>
+  <div class="video"><video id="vid" controls playsinline preload="metadata" src="scroll-compressor.mp4"></video></div>
+  <p style="margin-top:12px;font-size:.88rem;color:var(--muted)"><span data-l="fr">Vidéo générée à partir du même modèle 3D que cette page, sous-titrée en français et en anglais : rôle, vue éclatée, compression dans les spirales, embrayage, histoire.</span><span data-l="en">Video rendered from the same 3D model as this page, with French and English captions: role, exploded view, compression in the scrolls, clutch, history.</span></p>
+</div></section>
+
+<!-- 12 -->
+<section class="s" id="quiz"><div class="wrap">
+  <div class="sh"><div class="no">11</div><h2><span data-l="fr">Testez-vous avant le QCM</span><span data-l="en">Test yourself before the quiz</span></h2><div class="other"><span data-l="fr">Quiz and glossary</span><span data-l="en">Quiz et lexique</span></div></div>
+  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px"><span class="score" id="qScore">0 / 0</span><button class="btn" type="button" id="qReset"><span data-l="fr">Recommencer</span><span data-l="en">Start again</span></button></div>
+  <div class="quiz" id="qList"></div>
+  <h3 style="margin:44px 0 14px;font-size:1.4rem"><span data-l="fr">Lexique technique FR ⇄ EN</span><span data-l="en">Technical glossary FR ⇄ EN</span></h3>
+  <div class="tablewrap"><table class="lex"><thead><tr><th>Français</th><th>English</th></tr></thead><tbody id="lex"></tbody></table></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <p><b><span data-l="fr">Dossier technique SAÉ 1.1 · Analyse d’un produit grand public · BUT GMP 1</span><span data-l="en">SAÉ 1.1 technical file · Consumer product analysis · BUT GMP year 1</span></b></p>
+  <p><span data-l="fr">Sources : sujet de la SAÉ 1.1 et présentation de lancement ; CM en anglais « The functioning of a scroll compressor » et son corrigé ; fichiers CATIA du compresseur (nomenclature et éclaté linéaire) ; photo du compresseur du TP ; bases de données CES Selector et matweb.com. Modèle 3D, animations et vidéo réalisés en code ; formes simplifiées, non à l’échelle exacte.</span><span data-l="en">Sources: SAÉ 1.1 brief and kick-off slides; English lecture “The functioning of a scroll compressor” and its answer key; CATIA files of the compressor (bill of materials and linear exploded view); photo of the lab compressor; CES Selector and matweb.com databases. 3D model, animations and video made in code; simplified shapes, not to exact scale.</span></p>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script>
+/*__MODEL__*/
+</script>
+<script>
+(function(){
+const SC = window.SC, root = document.documentElement;
+let LANG = 'fr';
+try { const s = localStorage.getItem('sc-lang'); if (s === 'fr' || s === 'en') LANG = s; else if (!/^fr/i.test(navigator.language || 'fr')) LANG = 'en'; } catch (e) {}
+const listeners = [];
+function setLang(l){ LANG = l; root.dataset.lang = l; root.lang = l;
+  document.querySelectorAll('[data-set-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.setLang === l)));
+  try { localStorage.setItem('sc-lang', l); } catch (e) {}
+  listeners.forEach(f => f()); }
+document.querySelectorAll('[data-set-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.setLang)));
+const T = o => o[LANG];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- 3D ---------- */
+function envMap(renderer){
+  const s = new THREE.Scene(); s.background = new THREE.Color(0x262b31);
+  const box = (c, x, y, z, w, h, d, i) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(i) })); m.position.set(x, y, z); s.add(m); };
+  box(0xffffff, 0, 12, 0, 14, 0.5, 14, 3.2); box(0xfff1dc, -12, 4, 2, 0.5, 8, 10, 2.2); box(0xdfe9ff, 12, 3, -3, 0.5, 6, 12, 1.6); box(0xffffff, 0, -8, 0, 30, 0.5, 30, 0.25); box(0x8fb4ff, 2, 4, 12, 10, 6, 0.5, 0.8);
+  const pm = new THREE.PMREMGenerator(renderer); const t = pm.fromScene(s, 0.035).texture; pm.dispose(); return t;
+}
+function makeViewer(canvas, opt){
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: !!opt.preserve });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.82;
+  renderer.localClippingEnabled = true; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene(); scene.environment = envMap(renderer);
+  const cam = new THREE.PerspectiveCamera(32, 1, 0.5, 600);
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(18, 40, 22); key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+  Object.assign(key.shadow.camera, { left: -40, right: 40, top: 40, bottom: -40, near: 1, far: 140 }); scene.add(key);
+  scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x1a1d21, 0.35));
+  const model = SC.build(THREE); scene.add(model.root);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.ShadowMaterial({ opacity: 0.28 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  // orbite caméra
+  const v = { az: opt.az ?? 0.75, el: opt.el ?? 0.38, dist: opt.dist ?? 60, target: new THREE.Vector3(0, 9, 0), tAz: null, tEl: null, tDist: null, tTarget: new THREE.Vector3(0, 9, 0), pan: new THREE.Vector3() };
+  v.tAz = v.az; v.tEl = v.el; v.tDist = v.dist;
+  function placeCam(){ const t = v.target.clone().add(v.pan); cam.position.set(t.x + v.dist * Math.cos(v.el) * Math.sin(v.az), t.y + v.dist * Math.sin(v.el), t.z + v.dist * Math.cos(v.el) * Math.cos(v.az)); cam.lookAt(t); }
+  function resize(){ const r = canvas.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); cam.aspect = r.width / r.height; cam.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(canvas); resize();
+  // pointeurs
+  const ptrs = new Map(); let lastPinch = 0, moved = 0, button = 0;
+  canvas.addEventListener('pointerdown', e => { canvas.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); moved = 0; button = e.button; v.user = true; });
+  canvas.addEventListener('pointermove', e => {
+    if (!ptrs.has(e.pointerId)) { opt.onHover && opt.onHover(e); return; }
+    const p = ptrs.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+    if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (lastPinch) v.tDist = Math.min(220, Math.max(18, v.tDist * lastPinch / d)); lastPinch = d; return; }
+    if (button === 2 || e.shiftKey) { const s = v.dist * 0.0016; const right = new THREE.Vector3().setFromMatrixColumn(cam.matrix, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrix, 1); v.pan.addScaledVector(right, -dx * s).addScaledVector(up, dy * s); return; }
+    v.tAz -= dx * 0.008; v.tEl = Math.min(1.45, Math.max(-1.2, v.tEl + dy * 0.006));
+  });
+  const end = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) lastPinch = 0; if (moved < 6 && opt.onPick && e.type === 'pointerup') opt.onPick(e); };
+  canvas.addEventListener('pointerup', end); canvas.addEventListener('pointercancel', end); canvas.addEventListener('contextmenu', e => e.preventDefault());
+  if (opt.wheel) canvas.addEventListener('wheel', e => { e.preventDefault(); v.tDist = Math.min(220, Math.max(18, v.tDist * Math.exp(e.deltaY * 0.0012))); }, { passive: false });
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  function pick(e){ const r = canvas.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ndc, cam);
+    const hits = ray.intersectObject(model.root, true); for (const h of hits) { if (h.object.material.opacity < 0.5) continue; const cp = h.object.material.clippingPlanes; if (cp && cp.length && cp[0].distanceToPoint(h.point) < 0) continue; return h.object.userData.partId; } return null; }
+  let visible = true; new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(canvas);
+  const box = new THREE.Box3();
+  function frame(dt){ v.az += (v.tAz - v.az) * 0.14; v.el += (v.tEl - v.el) * 0.14; v.dist += (v.tDist - v.dist) * 0.1; v.target.lerp(v.tTarget, 0.1); placeCam(); }
+  function fit(){ model.root.updateMatrixWorld(true); box.setFromObject(model.root); const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3()); v.tTarget.copy(c); const h = Math.max(s.y, Math.max(s.x, s.z) / Math.max(cam.aspect, 0.6)); v.tDist = Math.max(30, h / (2 * Math.tan(cam.fov * Math.PI / 360)) * 1.25 + Math.max(s.x, s.z) * 0.6); ground.position.y = box.min.y - 0.05; }
+  return { renderer, scene, cam, model, v, frame, fit, pick, get visible(){ return visible; }, render(){ renderer.render(scene, cam); } };
+}
+
+/* hero */
+const hero = makeViewer(document.getElementById('hero3d'), { az: 0.9, el: 0.32 });
+hero.model.state.gap = 0; hero.model.state.explode = 0; hero.model.apply(); hero.fit(); hero.v.tTarget.y += 1;
+
+/* viewer éclaté */
+const vCanvas = document.getElementById('view3d'), tip = document.getElementById('vTip'), call = document.getElementById('vCall');
+let selected = null, hoverId = null;
+const view = makeViewer(vCanvas, { wheel: true, az: 0.55, el: 0.3,
+  onHover: e => { const id = view.pick(e); if (id !== hoverId) { hoverId = id; view.model.highlight(selected || hoverId, selected ? 0xf2a93b : 0x3a6fd0); if (selected && hoverId && hoverId !== selected) {} }
+    if (id) { const r = vCanvas.getBoundingClientRect(); tip.hidden = false; tip.textContent = T(SC.partById[id].name); tip.style.left = (e.clientX - r.left) + 'px'; tip.style.top = (e.clientY - r.top) + 'px'; } else tip.hidden = true; },
+  onPick: e => { const id = view.pick(e); select(id); } });
+vCanvas.addEventListener('pointerleave', () => { tip.hidden = true; hoverId = null; view.model.highlight(selected, 0xf2a93b); });
+const ms = view.model.state; ms.explode = 1; ms.gap = 0; view.model.root.rotation.z = -Math.PI / 2; view.model.apply(); view.fit();
+const repOf = id => SC.REP[id];
+let iso = false, running = false, coil = true, cut = false;
+const clipPlane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+function renderInfo(){
+  const el = document.getElementById('vInfo');
+  if (!selected) { el.innerHTML = `<span class="rep">${LANG === 'fr' ? 'AUCUNE PIÈCE SÉLECTIONNÉE' : 'NO PART SELECTED'}</span><h3>${LANG === 'fr' ? 'Choisissez une pièce' : 'Pick a part'}</h3><p style="color:var(--muted);font-size:.9rem">${LANG === 'fr' ? 'Cliquez une pièce dans la vue 3D ou dans la liste. Sa fonction, son matériau et son procédé d’obtention s’affichent ici, avec son nom dans l’autre langue.' : 'Click a part in the 3D view or in the list. Its function, material and manufacturing process appear here, with its name in the other language.'}</p>`; return; }
+  const p = SC.partById[selected], o = LANG === 'fr' ? 'en' : 'fr';
+  el.innerHTML = `<span class="rep">REP. ${String(repOf(p.id)).padStart(2, '0')} · ${T(SC.groups[p.g])} · ×${p.qty}</span><h3>${T(p.name)}</h3><span class="alt">${o.toUpperCase()} · ${p.name[o]}</span>
+  <dl><div><dt>${LANG === 'fr' ? 'Fonction' : 'Function'}</dt><dd>${T(p.fn)}</dd></div><div><dt>${LANG === 'fr' ? 'Matériau probable' : 'Likely material'}</dt><dd>${T(p.mat)}</dd></div><div><dt>${LANG === 'fr' ? 'Procédé d’obtention' : 'Manufacturing process'}</dt><dd>${T(p.proc)}</dd></div><div><dt>${LANG === 'fr' ? 'Fichier CATIA' : 'CATIA file'}</dt><dd class="mono" style="font-size:.8rem">${p.cat}.CATPart</dd></div></dl>`;
+}
+function renderList(){
+  const el = document.getElementById('vList'); let h = '';
+  for (const g in SC.groups) { h += `<h4>${T(SC.groups[g])}</h4>`; SC.PARTS.filter(p => p.g === g).sort((a, b) => repOf(a.id) - repOf(b.id)).forEach(p => { h += `<button type="button" data-id="${p.id}" aria-current="${p.id === selected}"><span>${String(repOf(p.id)).padStart(2, '0')}</span><span>${T(p.name)}</span><span>×${p.qty}</span></button>`; }); }
+  el.innerHTML = h; el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.id === selected ? null : b.dataset.id)));
+}
+function applyIso(){ view.model.setOpacity(id => (!iso || !selected || id === selected) ? 1 : 0.1); }
+function select(id){ selected = id; view.model.highlight(selected, 0xf2a93b); applyIso(); renderInfo(); document.querySelectorAll('#vList button').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === selected))); const b = document.querySelector(`#vList button[data-id="${id}"]`); if (b) b.scrollIntoView({ block: 'nearest' }); }
+listeners.push(renderInfo, renderList);
+const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); fn(on); }); };
+tog('vRun', on => running = on);
+tog('vCut', on => { cut = on; view.model.setClip(on ? [clipPlane] : []); });
+tog('vIso', on => { iso = on; applyIso(); });
+tog('vCoil', on => coil = on);
+document.getElementById('vReset').addEventListener('click', () => { view.v.tAz = 0.55; view.v.tEl = 0.3; view.v.pan.set(0, 0, 0); view.fit(); });
+const ex = document.getElementById('vExplode');
+ex.addEventListener('input', () => { ms.explode = ex.value / 100; view.model.apply(); view.fit(); });
+document.getElementById('vExplode').addEventListener('change', () => view.fit());
+
+/* repères numérotés, comme sur un éclaté de bureau d'études */
+let balOn = true; tog('vBal', on => { balOn = on; });
+const balSvg = document.getElementById('vBalloons'), NS = 'http://www.w3.org/2000/svg';
+const balG = {}; SC.PARTS.forEach(p => { const g = document.createElementNS(NS, 'g'); g.innerHTML = '<line/><circle class="d" r="2.2"/><circle class="b" r="11"/><text></text>'; g.querySelector('text').textContent = String(repOf(p.id)).padStart(2, '0');
+  g.querySelector('.b').addEventListener('click', () => select(selected === p.id ? null : p.id)); g.querySelector('.b').addEventListener('mouseenter', e => { tip.hidden = false; tip.textContent = T(p.name); const r = vCanvas.getBoundingClientRect(); tip.style.left = (e.clientX - r.left) + 'px'; tip.style.top = (e.clientY - r.top) + 'px'; });
+  g.querySelector('.b').addEventListener('mouseleave', () => tip.hidden = true); balSvg.appendChild(g); balG[p.id] = g; });
+const bA = new THREE.Vector3(), bB = new THREE.Vector3(), bBox = new THREE.Box3();
+function balloons(){ const show = balOn && ms.explode > 0.3; balSvg.style.display = show ? '' : 'none'; if (!show) return;
+  const r = vCanvas.getBoundingClientRect(); const P = v => [(v.x + 1) / 2 * r.width, (1 - v.y) / 2 * r.height];
+  bA.set(0, 0, 0).applyMatrix4(view.model.root.matrixWorld).project(view.cam); bB.set(0, 30, 0).applyMatrix4(view.model.root.matrixWorld).project(view.cam);
+  const [ax, ay] = P(bA), [bx, by] = P(bB); let nx = -(by - ay), ny = bx - ax; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl; if (ny > 0) { nx = -nx; ny = -ny; }
+  balSvg.style.opacity = Math.min(1, (ms.explode - 0.3) / 0.3);
+  for (const id in balG) { const p = view.model.parts[id], g = balG[id]; bBox.setFromObject(p.g); bBox.getCenter(bA).project(view.cam); const [x, y] = P(bA);
+    const rep = repOf(id), side = rep % 2 ? 1 : -1, d = 42 + (rep % 4) * 19; let X = x + nx * d * side, Y = y + ny * d * side;
+    X = Math.max(14, Math.min(r.width - 14, X)); Y = Math.max(58, Math.min(r.height - 66, Y));
+    const l = g.children[0]; l.setAttribute('x1', x); l.setAttribute('y1', y); l.setAttribute('x2', X); l.setAttribute('y2', Y);
+    g.children[1].setAttribute('cx', x); g.children[1].setAttribute('cy', y); g.children[2].setAttribute('cx', X); g.children[2].setAttribute('cy', Y); g.children[3].setAttribute('x', X); g.children[3].setAttribute('y', Y);
+    g.classList.toggle('on', id === selected); g.style.opacity = (iso && selected && id !== selected) ? 0.15 : 1; } }
+
+/* boucle de rendu */
+let last = performance.now(), callTick = 0;
+const v3 = new THREE.Vector3();
+function loop(t){
+  const dt = Math.min(0.05, (t - last) / 1000); last = t;
+  if (hero.visible) { const s = hero.model.state; if (!reduce) { s.pulley += dt * 6; s.theta += dt * 6; if (!hero.v.user) hero.v.tAz += dt * 0.25; } hero.model.apply(); hero.frame(dt); hero.render(); }
+  if (view.visible) {
+    if (running) { ms.pulley += dt * 5; if (coil) ms.theta += dt * 5; }
+    ms.gap += ((coil ? 0 : 0.35) - ms.gap) * 0.2; view.model.apply(); view.frame(dt); view.render();
+    if (selected && ++callTick % 2 === 0) { const g = view.model.parts[selected].g; const b = new THREE.Box3().setFromObject(g); b.getCenter(v3); v3.x = b.max.x; v3.project(view.cam); const r = vCanvas.getBoundingClientRect();
+      if (v3.z < 1 && !balOn) { call.hidden = false; call.textContent = String(repOf(selected)).padStart(2, '0'); call.style.left = ((v3.x + 1) / 2 * r.width + 14) + 'px'; call.style.top = ((1 - v3.y) / 2 * r.height - 8) + 'px'; } else call.hidden = true; } else if (!selected) call.hidden = true;
+    balloons();
+  }
+  if (cl.visible) clutchFrame(dt);
+  if (am.visible) asmFrame(dt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ---------- poches 2D ---------- */
+const pc = document.getElementById('pockets'), pctx = pc.getContext('2d'), pr = SC.makePocketRenderer(210);
+let pTheta = 0, pPlay = !reduce; const pAngle = document.getElementById('pAngle'), pDeg = document.getElementById('pDeg');
+const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+/* cycle d’une poche : aspiration (1 tour), compression (1,6 tour), refoulement (0,4 tour) */
+const PI2 = Math.PI * 2, CYC = 3 * PI2, A1 = PI2, A2 = PI2 + 3.2 * Math.PI, P1 = 3, VI = 2.6, NPOL = 1.15, PD = P1 * VI ** NPOL;
+function pvAt(a){ if (a < A1) return [a / A1, P1, 0]; if (a < A2) { const k = (a - A1) / (A2 - A1), V = 1 - k * (1 - 1 / VI); return [V, P1 * (1 / V) ** NPOL, a < A1 + 0.8 * Math.PI ? 1 : 2]; } const k = (a - A2) / (CYC - A2); return [(1 - k) / VI, PD, 3]; }
+function drawPV(a){ const svg = document.getElementById('pvChart'), W = 520, H = 250, L = 46, R = 18, Tp = 16, B = 34, pm = 11;
+  const X = v => L + v * (W - L - R), Y = p => H - B - p / pm * (H - Tp - B);
+  if (!svg.dataset.ready) { let s = ''; for (let p = 0; p <= pm; p += 2) s += `<line x1="${L}" x2="${W - R}" y1="${Y(p)}" y2="${Y(p)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(p) + 4}" text-anchor="end">${p}</text>`;
+    s += `<text x="${W - R}" y="${H - 8}" text-anchor="end">V</text><text x="${L - 8}" y="${Tp - 4}" text-anchor="end">p (bar)</text>`;
+    let d = ''; for (let i = 0; i <= 240; i++) { const q = pvAt(i / 240 * CYC * 0.9999); d += (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }
+    s += `<path d="${d}Z" fill="color-mix(in srgb,var(--mid) 12%,transparent)" stroke="var(--muted)" stroke-width="1.5"/>`;
+    s += `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(P1)}" y2="${Y(P1)}" stroke="var(--lp)" stroke-width="3"/><line x1="${X(0)}" x2="${X(1 / VI)}" y1="${Y(PD)}" y2="${Y(PD)}" stroke="var(--hp)" stroke-width="3"/>`;
+    s += `<text x="${X(0.55)}" y="${Y(P1) + 18}" fill="var(--lp)" style="fill:var(--lp)">BP · ${P1} bar</text><text x="${X(0.02)}" y="${Y(PD) - 8}" style="fill:var(--hp)">HP · ${PD.toFixed(1).replace('.', LANG === 'fr' ? ',' : '.')} bar</text>`;
+    s += `<circle id="pvDot" r="7" fill="var(--accent)" stroke="var(--panel)" stroke-width="2.5"/>`; svg.innerHTML = s; svg.dataset.ready = 1; }
+  const q = pvAt(a); const dot = svg.querySelector('#pvDot'); dot.setAttribute('cx', X(q[0])); dot.setAttribute('cy', Y(q[1])); return q[2]; }
+listeners.push(() => { const s = document.getElementById('pvChart'); delete s.dataset.ready; drawPockets(); });
+function drawPockets(){ pctx.clearRect(0, 0, pc.width, pc.height);
+  pr.draw(pctx, pc.width, pTheta, { lp: css('--lp'), hp: css('--hp'), mid: css('--mid'), fixed: '#9aa4ad', mobile: '#d9b56d', edge: 'rgba(0,0,0,.35)', showOrbit: true, orbitColor: '#d9b56d' });
+  const a = ((pTheta % CYC) + CYC) % CYC; const deg = Math.round(a * 180 / Math.PI); pDeg.textContent = deg + '°'; pAngle.value = deg;
+  const s = drawPV(a); document.querySelectorAll('#steps li').forEach((li, i) => li.classList.toggle('on', i === s)); }
+const pBtn = document.getElementById('pPlay');
+function setPlay(on){ pPlay = on; pBtn.setAttribute('aria-pressed', String(on)); pBtn.innerHTML = on ? '<span data-l="fr">❚❚ Pause</span><span data-l="en">❚❚ Pause</span>' : '<span data-l="fr">▶ Lecture</span><span data-l="en">▶ Play</span>'; }
+pBtn.addEventListener('click', () => setPlay(!pPlay)); setPlay(pPlay);
+pAngle.addEventListener('input', () => { setPlay(false); pTheta = pAngle.value * Math.PI / 180; drawPockets(); });
+let pVis = true; new IntersectionObserver(es => pVis = es[0].isIntersecting).observe(pc);
+let pLast = 0; (function ploop(t){ if (pVis && pPlay && t - pLast > 33) { pTheta += 0.045; drawPockets(); pLast = t; } requestAnimationFrame(ploop); })(0);
+drawPockets();
+
+/* ---------- embrayage ---------- */
+const cBtn = document.getElementById('coilBtn'), cState = document.getElementById('coilState');
+let cOn = true, aP = 0, aS = 0;
+const cl = makeViewer(document.getElementById('clutch3d'), { az: 0.3, el: 0.16 });
+cl.model.setClip([new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)]);
+cl.v.tTarget.set(1.2, 13.2, 0); cl.v.target.copy(cl.v.tTarget); cl.v.tDist = cl.v.dist = 50; cl.model.state.gap = 0; cl.model.root.updateMatrixWorld(true);
+const CL = [['poulie', [5.4, 15.0], 'Poulie', 'Pulley', 95, 0], ['electro', [3.0, 14.2], 'Bobine', 'Coil', 70, 62], ['embrayage', [4.4, 17.15], 'Plateau', 'Clutch plate', 70, -58], ['roulement3552', [2.2, 16.0], 'Roulement', 'Bearing', -90, -48], ['axe', [0, 11.5], 'Arbre', 'Shaft', -90, 10], ['corps', [5.8, 8.5], 'Corps', 'Housing', 85, 10]];
+const cLab = document.getElementById('cLabels');
+cLab.innerHTML = '<svg class="balloons" id="cLines"></svg>' + CL.map(c => `<div class="clab" data-c="${c[0]}"><span data-l="fr">${c[2]}</span><span data-l="en">${c[3]}</span><i><span data-l="fr">${c[3]}</span><span data-l="en">${c[2]}</span></i></div>`).join('');
+const cLines = document.getElementById('cLines'); cLines.innerHTML = CL.map(() => '<line/><circle class="d" r="2.5"/>').join('');
+const coilMeshes = []; cl.model.parts.electro.g.traverse(o => { if (o.isMesh) coilMeshes.push(o); });
+function cText(){ cState.textContent = cOn ? (LANG === 'fr' ? 'EMBRAYÉ · le compresseur comprime' : 'ENGAGED · the compressor runs') : (LANG === 'fr' ? 'DÉBRAYÉ · l’arbre est à l’arrêt' : 'DISENGAGED · the shaft is stopped'); cState.classList.toggle('on', cOn); cLab.querySelector('[data-c="electro"]').classList.toggle('hot', cOn); }
+cBtn.addEventListener('click', () => { cOn = !cOn; cBtn.setAttribute('aria-pressed', String(cOn)); cText(); });
+listeners.push(cText); cText();
+const cv3 = new THREE.Vector3();
+function clutchFrame(dt){ const s = cl.model.state; if (!reduce) { s.pulley += dt * 4; if (cOn) s.theta += dt * 4; aP = s.pulley * 57.3; aS = s.theta * 57.3; }
+  s.gap += ((cOn ? 0 : 0.5) - s.gap) * 0.25; cl.model.apply();
+  coilMeshes.forEach(m => { m.material.emissive.setHex(cOn ? 0xff3a10 : 0); m.material.emissiveIntensity = cOn ? 0.45 + 0.15 * Math.sin(performance.now() / 180) : 1; });
+  cl.frame(dt); cl.render();
+  const r = cl.renderer.domElement.getBoundingClientRect(), box = cLab.parentElement.getBoundingClientRect();
+  CL.forEach((c, i) => { cv3.set(c[1][0], c[1][1] + (c[0] === 'embrayage' ? s.gap : 0), 0).applyMatrix4(cl.model.root.matrixWorld).project(cl.cam); const el = cLab.querySelector(`[data-c="${c[0]}"]`);
+    const x = (cv3.x + 1) / 2 * r.width + r.left - box.left, y = (1 - cv3.y) / 2 * r.height + r.top - box.top, X = Math.max(50, Math.min(box.width - 50, x + c[4])), Y = y + c[5];
+    el.style.left = X + 'px'; el.style.top = Y + 'px'; const ln = cLines.children[i * 2], dt2 = cLines.children[i * 2 + 1];
+    ln.setAttribute('x1', x); ln.setAttribute('y1', y); ln.setAttribute('x2', X); ln.setAttribute('y2', Y); dt2.setAttribute('cx', x); dt2.setAttribute('cy', y); });
+  document.getElementById('dialP').setAttribute('transform', `rotate(${aP})`); document.getElementById('dialS').setAttribute('transform', `rotate(${aS})`); }
+
+/* ---------- graphe de montage ---------- */
+const N = id => SC.partById[id];
+const ASM = [
+  { base: 1, t: { fr: 'Corps', en: 'Housing' }, p: ['corps'] },
+  { t: { fr: 'Roulement de l’arbre', en: 'Shaft bearing' }, p: ['roulement3547', 'circlipsInt45'] },
+  { t: { fr: 'Arbre', en: 'Shaft' }, p: ['axe', 'masseInertie'], sub: 1 },
+  { t: { fr: 'Étanchéité avant', en: 'Front sealing' }, p: ['jointSPI', 'roulement1228', 'circlips10'] },
+  { t: { fr: 'Anti-rotation', en: 'Anti-rotation' }, p: ['patins', 'feuilleVF', 'rondGuide', 'billes', 'feuilleVM'] },
+  { t: { fr: 'Excentrique', en: 'Eccentric' }, p: ['masselotte', 'roulementExc'] },
+  { t: { fr: 'Volute mobile', en: 'Orbiting scroll' }, p: ['voluteMobile'] },
+  { t: { fr: 'Volute fixe', en: 'Fixed scroll' }, p: ['grandJoint', 'voluteFixe'] },
+  { t: { fr: 'Clapet de refoulement', en: 'Discharge valve' }, p: ['clapetSouple', 'clapetRigide', 'visClapet'], sub: 1 },
+  { t: { fr: 'Couvercle', en: 'Rear head' }, p: ['jointCouvercle', 'jointMetal', 'couvercle', 'visCouvercle', 'bouchon'] },
+  { t: { fr: 'Bobine', en: 'Coil' }, p: ['electro', 'circlips46', 'visM6'] },
+  { t: { fr: 'Poulie et plateau', en: 'Pulley and plate' }, p: ['roulement3552', 'poulie', 'circlips33', 'rondelle', 'embrayage', 'ecrou'], sub: 1 },
+  { t: { fr: 'Accessoires', en: 'Accessories' }, p: ['capteur', 'visCHC', 'gicleur'] }
+];
+function renderAsm(){ const el = document.getElementById('asm'); el.innerHTML = ASM.map((s, i) => `<li data-i="${i}"><span class="n">${String(i + 1).padStart(2, '0')}</span><div class="row"><b>${T(s.t)}</b>${s.p.map(id => `<span class="chip${s.sub ? ' sub' : ''}">${T(N(id).name)}${N(id).qty > 1 ? ' ×' + N(id).qty : ''}</span>`).join('')}</div></li>`).join('');
+  el.querySelectorAll('li').forEach(li => li.addEventListener('click', () => { aPlaying = false; goStep(+li.dataset.i); })); asmUI(); }
+/* montage animé */
+const am = makeViewer(document.getElementById('asm3d'), { az: 0.62, el: 0.38 });
+const amS = am.model.state; amS.explode = 0; amS.per = {}; amS.hidden = {}; am.model.root.rotation.z = -Math.PI / 2;
+am.model.setClip([new THREE.Plane(new THREE.Vector3(0, 0, -1), 0)]); am.model.apply(); am.fit(); am.v.tDist *= 1.12;
+const stepOfPart = {}; ASM.forEach((s, i) => s.p.forEach(id => stepOfPart[id] = i));
+let aStep = ASM.length - 1, aProg = 1, aPlaying = false, aRev = false, aHold = 0;
+const aPlay = document.getElementById('aPlay');
+function asmUI(){ document.querySelectorAll('#asm li').forEach((li, i) => { li.classList.toggle('cur', i === aStep); li.classList.toggle('done', aRev ? i > aStep : i < aStep); li.classList.toggle('todo', aRev ? i < aStep && false : i > aStep); });
+  document.getElementById('aStepNo').textContent = String(aStep + 1).padStart(2, '0') + ' / ' + ASM.length; document.getElementById('aStepName').textContent = T(ASM[aStep].t);
+  aPlay.innerHTML = aPlaying ? (LANG === 'fr' ? '❚❚ Pause' : '❚❚ Pause') : (LANG === 'fr' ? '▶ Lancer le ' + (aRev ? 'démontage' : 'montage') : '▶ Play ' + (aRev ? 'disassembly' : 'assembly')); aPlay.setAttribute('aria-pressed', String(aPlaying)); }
+function goStep(i){ aStep = Math.max(0, Math.min(ASM.length - 1, i)); aProg = 0; asmUI(); }
+document.getElementById('aPrev').addEventListener('click', () => { aPlaying = false; goStep(aStep + (aRev ? 1 : -1)); });
+document.getElementById('aNext').addEventListener('click', () => { aPlaying = false; goStep(aStep + (aRev ? -1 : 1)); });
+aPlay.addEventListener('click', () => { aPlaying = !aPlaying; if (aPlaying && (aRev ? aStep === 0 && aProg >= 1 : aStep === ASM.length - 1 && aProg >= 1)) goStep(aRev ? ASM.length - 1 : 0); asmUI(); });
+tog('aRev', on => { aRev = on; aPlaying = false; goStep(on ? ASM.length - 1 : 0); aProg = on ? 0 : 1; });
+const eio = x => x < .5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
+function asmFrame(dt){ aProg = Math.min(1, aProg + dt / 1.1);
+  if (aPlaying && aProg >= 1) { aHold += dt; if (aHold > 0.5) { aHold = 0; const n = aStep + (aRev ? -1 : 1); if (n < 0 || n >= ASM.length) { aPlaying = false; asmUI(); } else goStep(n); } }
+  const k = eio(aProg);
+  for (const id in am.model.parts) { const st = stepOfPart[id];
+    if (!aRev) { amS.hidden[id] = st > aStep; amS.per[id] = st === aStep ? (1 - k) * 1.5 : 0; }
+    else { amS.hidden[id] = st > aStep || (st === aStep && aProg >= 1); amS.per[id] = st === aStep ? k * 1.5 : 0; } }
+  for (const id in am.model.parts) { const on = stepOfPart[id] === aStep; am.model.parts[id].g.traverse(o => { if (o.isMesh) { o.material.emissive.setHex(on ? 0xf2a93b : 0); o.material.emissiveIntensity = on ? 0.35 * (1 - (aRev ? 0 : k) * 0.6) : 1; } }); }
+  if (!reduce) { amS.theta += dt * 2; amS.pulley += dt * 2; }
+  am.model.apply(); am.frame(dt); am.render(); }
+listeners.push(renderAsm);
+
+/* ---------- masse volumique ---------- */
+const MATS = [['Mg', 1.74, { fr: 'Magnésium', en: 'Magnesium' }], ['Al', 2.70, { fr: 'Alliage d’aluminium', en: 'Aluminium alloy' }], ['Ti', 4.51, { fr: 'Titane', en: 'Titanium' }], ['Zn', 7.0, { fr: 'Zamak (zinc)', en: 'Zamak (zinc)' }], ['Fe', 7.85, { fr: 'Acier / fonte', en: 'Steel / cast iron' }], ['CuZn', 8.5, { fr: 'Laiton', en: 'Brass' }], ['Cu', 8.94, { fr: 'Cuivre', en: 'Copper' }], ['Pb', 11.3, { fr: 'Plomb', en: 'Lead' }]];
+const fmt = (x, d) => isFinite(x) ? x.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB', { maximumFractionDigits: d, minimumFractionDigits: d }) : '–';
+function calcD(){ const m = +dM.value, v = +dV2.value - +dV1.value, e = +dE.value; const rho = m / v; const u = rho * (0.1 / m + 2 * e / v);
+  document.getElementById('dRho').textContent = v > 0 ? fmt(rho, 2) + ' g/cm³' : '–'; document.getElementById('dU').textContent = v > 0 ? '± ' + fmt(u, 2) + ' g/cm³' : '–';
+  let best = -1, bd = 1e9; MATS.forEach((x, i) => { const d = Math.abs(x[1] - rho); if (d < bd) { bd = d; best = i; } });
+  document.getElementById('dChips').innerHTML = MATS.map((x, i) => `<span class="chip${i === best && v > 0 ? ' hit' : ''}">${T(x[2])} · ${fmt(x[1], 2)}</span>`).join(''); }
+const dM = document.getElementById('dM'), dV1 = document.getElementById('dV1'), dV2 = document.getElementById('dV2'), dE = document.getElementById('dE');
+[dM, dV1, dV2, dE].forEach(i => i.addEventListener('input', calcD)); listeners.push(calcD);
+
+/* ---------- électroaimant ---------- */
+const FDATA = [[6, 700], [8, 1220], [10, 1780], [12, 2400], [14, 2900]];
+const eIds = ['eU', 'eI', 'eF', 'eR1', 'eR2'].map(i => document.getElementById(i));
+function calcE(){ const [U, I, f, R1, R2] = eIds.map(i => +i.value); const Rm = (R1 + R2) / 2000;
+  document.getElementById('eRes').textContent = fmt(U / I, 2) + ' Ω'; document.getElementById('ePow').textContent = fmt(U * I, 1) + ' W';
+  const near = FDATA.reduce((a, b) => Math.abs(b[0] - U) < Math.abs(a[0] - U) ? b : a); document.getElementById('eTq').textContent = fmt(f * near[1] * Rm, 1) + ' N·m';
+  document.getElementById('fBody').innerHTML = FDATA.map((r, i) => `<tr><td class="mono">${r[0]}</td><td><input type="number" data-i="${i}" value="${r[1]}" aria-label="F ${r[0]} V"></td><td class="mono">${fmt(f * r[1] * Rm, 1)}</td></tr>`).join('');
+  document.querySelectorAll('#fBody input').forEach(inp => inp.addEventListener('change', () => { FDATA[+inp.dataset.i][1] = +inp.value; calcE(); }));
+  chart(); }
+function chart(){ const svg = document.getElementById('fChart'), W = 480, H = 280, L = 52, R = 16, Tp = 16, B = 40;
+  const xm = 16, ym = Math.ceil(Math.max(...FDATA.map(r => r[1])) * 1.15 / 500) * 500; const X = u => L + u / xm * (W - L - R), Y = f => H - B - f / ym * (H - Tp - B);
+  const k = (FDATA[0][1] / FDATA[0][0] ** 2 + FDATA[1][1] / FDATA[1][0] ** 2) / 2;
+  let s = ''; for (let f = 0; f <= ym; f += 500) s += `<line x1="${L}" x2="${W - R}" y1="${Y(f)}" y2="${Y(f)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(f) + 4}" text-anchor="end">${f}</text>`;
+  for (let u = 0; u <= xm; u += 2) s += `<text x="${X(u)}" y="${H - B + 18}" text-anchor="middle">${u}</text>`;
+  s += `<line x1="${L}" x2="${W - R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--muted)"/><text x="${W - R}" y="${H - 6}" text-anchor="end">U (V)</text><text x="${L - 8}" y="${Tp - 4}" text-anchor="end">F (N)</text>`;
+  let d = ''; for (let u = 0; u <= xm; u += 0.25) { const f = k * u * u; if (f > ym) break; d += (d ? 'L' : 'M') + X(u).toFixed(1) + ' ' + Y(f).toFixed(1); }
+  s += `<path d="${d}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+  s += `<path d="${FDATA.map((r, i) => (i ? 'L' : 'M') + X(r[0]) + ' ' + Y(r[1])).join('')}" fill="none" stroke="var(--accent)" stroke-width="2.5"/>`;
+  s += FDATA.map(r => `<circle cx="${X(r[0])}" cy="${Y(r[1])}" r="5" fill="var(--accent)" stroke="var(--panel)" stroke-width="2"/>`).join('');
+  svg.innerHTML = s; }
+eIds.forEach(i => i.addEventListener('input', calcE)); listeners.push(calcE);
+
+/* ---------- quiz ---------- */
+const Q = [
+  { q: { fr: 'Qui a déposé le premier brevet de compresseur scroll, en 1905 ?', en: 'Who filed the first scroll compressor patent, in 1905?' }, o: [['Léon Creux', 'Léon Creux'], ['Niels Young', 'Niels Young'], ['Sanden', 'Sanden'], ['Hitachi', 'Hitachi']], a: 0 },
+  { q: { fr: 'Pourquoi n’a-t-on pas pu le construire à l’époque ?', en: 'Why could it not be built at the time?' }, o: [['Le fluide R134a n’existait pas', 'R134a did not exist'], ['La fonderie n’était pas assez précise', 'Casting was not precise enough'], ['Il n’y avait pas de voitures', 'There were no cars'], ['Le brevet était interdit', 'The patent was banned']], a: 1 },
+  { q: { fr: 'Quel constructeur a commercialisé le premier compresseur scroll automobile en 1981 ?', en: 'Which manufacturer sold the first automotive scroll compressor in 1981?' }, o: [['Hitachi', 'Hitachi'], ['Danfoss', 'Danfoss'], ['Sanden', 'Sanden'], ['Renault', 'Renault']], a: 2 },
+  { q: { fr: 'Comment se déplace la volute mobile ?', en: 'How does the orbiting scroll move?' }, o: [['Elle tourne sur son axe', 'It spins on its axis'], ['Elle fait des allers-retours', 'It moves up and down'], ['Translation circulaire, sans tourner sur elle-même', 'Circular translation, without spinning'], ['Elle reste fixe', 'It stays still']], a: 2 },
+  { q: { fr: 'À quoi servent les billes entre la volute mobile et le corps ?', en: 'What are the balls between the orbiting scroll and the housing for?' }, o: [['Lubrifier les spirales', 'Lubricate the scrolls'], ['Empêcher la volute mobile de tourner sur elle-même', 'Stop the orbiting scroll from spinning'], ['Refroidir le gaz', 'Cool the gas'], ['Guider la poulie', 'Guide the pulley']], a: 1 },
+  { q: { fr: 'Par où sort le gaz comprimé ?', en: 'Where does the compressed gas leave?' }, o: [['Par la périphérie des spirales', 'At the outside of the spirals'], ['Au centre, par un clapet anti-retour', 'At the centre, through a non-return valve'], ['Par le joint à lèvre', 'Through the lip seal'], ['Par la poulie', 'Through the pulley']], a: 1 },
+  { q: { fr: 'Pourquoi la poulie est-elle débrayable ?', en: 'Why is the pulley disengageable?' }, o: [['Pour arrêter le compresseur sans arrêter le moteur', 'To stop the compressor without stopping the engine'], ['Pour changer de sens de rotation', 'To reverse rotation'], ['Pour démarrer le moteur', 'To start the engine'], ['Pour régler la courroie', 'To tension the belt']], a: 0 },
+  { q: { fr: 'Une pièce a une masse volumique de 2,7 g/cm³. C’est probablement…', en: 'A part has a density of 2.7 g/cm³. It is probably…' }, o: [['de l’acier', 'steel'], ['du cuivre', 'copper'], ['un alliage d’aluminium', 'an aluminium alloy'], ['du laiton', 'brass']], a: 2 },
+  { q: { fr: '“Continuous compression” veut dire…', en: '« Compression continue » means…' }, o: [['un débit régulier, sans pulsations', 'a smooth flow, with no pulses'], ['un compresseur qui ne s’arrête jamais', 'a compressor that never stops'], ['une pression constante partout', 'the same pressure everywhere'], ['un moteur électrique intégré', 'a built-in electric motor']], a: 0 },
+  { q: { fr: 'Le capteur de température (fail-safe temperature sensor) sert à…', en: 'The fail-safe temperature sensor is used to…' }, o: [['afficher la température de l’habitacle', 'show the cabin temperature'], ['couper le compresseur en cas de surchauffe', 'cut the compressor if it overheats'], ['régler l’entrefer', 'set the air gap'], ['mesurer la pression', 'measure pressure']], a: 1 }
+];
+let answers = {};
+function renderQuiz(){ const li = LANG === 'fr' ? 0 : 1; document.getElementById('qList').innerHTML = Q.map((x, i) => `<div class="card q"><span class="qn">Q${i + 1}</span><p>${T(x.q)}</p><div class="opts">${x.o.map((o, j) => { const a = answers[i]; const cls = a === undefined ? '' : j === x.a ? 'good' : j === a ? 'wrong' : ''; return `<button type="button" data-q="${i}" data-o="${j}" class="${cls}" ${a !== undefined ? 'disabled' : ''}>${o[li]}</button>`; }).join('')}</div></div>`).join('');
+  document.querySelectorAll('#qList button').forEach(b => b.addEventListener('click', () => { answers[+b.dataset.q] = +b.dataset.o; renderQuiz(); }));
+  const n = Object.keys(answers).length, ok = Object.entries(answers).filter(([i, a]) => Q[i].a === a).length; document.getElementById('qScore').textContent = `${ok} / ${n}` + (n === Q.length ? (LANG === 'fr' ? ' · terminé' : ' · done') : ''); }
+document.getElementById('qReset').addEventListener('click', () => { answers = {}; renderQuiz(); });
+listeners.push(renderQuiz);
+const LEX = [['Compresseur à spirales','Scroll (spiral) compressor'],['Volute fixe','Fixed (stationary) scroll'],['Volute mobile','Orbiting scroll'],['Chambre de compression','Compression chamber'],['Chambre d’aspiration','Suction chamber'],['Orifice d’aspiration','Suction port'],['Orifice de refoulement','Discharge port'],['Clapet anti-retour','Non-return valve'],['Capteur de température','Fail-safe temperature sensor'],['Translation circulaire','Circular translation'],['Fluide frigorigène','Refrigerant'],['Condenseur / évaporateur','Condenser / evaporator'],['Détendeur','Expansion valve'],['Poulie à gorges','Grooved pulley'],['Embrayage électromagnétique','Electromagnetic clutch'],['Bobine','Coil'],['Entrefer','Air gap'],['Roulement','Bearing'],['Joint torique','O-ring'],['Joint à lèvre','Lip seal'],['Arbre excentrique','Eccentric shaft'],['Contrepoids','Counterweight'],['Circlips','Circlip (retaining ring)'],['Vis / écrou / rondelle','Screw / nut / washer'],['Moulage sous pression','Die casting'],['Usinage','Machining'],['Masse volumique','Density'],['Couple','Torque'],['Rendement','Efficiency'],['Vue éclatée','Exploded view']];
+document.getElementById('lex').innerHTML = LEX.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+
+setLang(LANG);
+})();
+</script>

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>Rendu vidéo · compresseur scroll</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&display=swap">
+<style>body{margin:0;background:#111;color:#ddd;font:14px system-ui}#c{width:960px;height:540px;display:block}#log{padding:8px;font-family:monospace;white-space:pre-wrap}</style></head>
+<body><canvas id="c" width="1280" height="720"></canvas><div id="log">prêt</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
+<script src="model.js"></script>
+<script>
+const W = 1280, H = 720, FPS = 30, DUR = 72;
+const C = { bg: '#0a0f14', panel: '#131b23', ink: '#e6ecf1', muted: '#8a98a6', line: '#2a3744', accent: '#f2a93b', lp: '#4b8cff', hp: '#ff5b3a', mid: '#b06ad8' };
+const out = document.getElementById('c'), ctx = out.getContext('2d');
+const logEl = document.getElementById('log'); const log = s => { logEl.textContent = s; fetch('/log', { method: 'POST', body: s }).catch(() => {}); };
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), seg = (t, a, b) => clamp((t - a) / (b - a)), ease = x => x < .5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2, eout = x => 1 - (1 - x) ** 3;
+const DISP = '"Archivo", Arial, sans-serif', BODY = '"IBM Plex Sans", Arial, sans-serif', MONO = '"IBM Plex Mono", monospace';
+
+/* ---- 3D ---- */
+const glc = document.createElement('canvas'); glc.width = W; glc.height = H;
+const renderer = new THREE.WebGLRenderer({ canvas: glc, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.82;
+renderer.localClippingEnabled = true; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+{ const s = new THREE.Scene(); s.background = new THREE.Color(0x262b31);
+  const box = (c, x, y, z, w, h, d, i) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(i) })); m.position.set(x, y, z); s.add(m); };
+  box(0xffffff, 0, 12, 0, 14, .5, 14, 3.2); box(0xfff1dc, -12, 4, 2, .5, 8, 10, 2.2); box(0xdfe9ff, 12, 3, -3, .5, 6, 12, 1.6); box(0xffffff, 0, -8, 0, 30, .5, 30, .25); box(0x8fb4ff, 2, 4, 12, 10, 6, .5, .8);
+  const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromScene(s, 0.035).texture; }
+const cam = new THREE.PerspectiveCamera(32, W / H, 0.5, 600);
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(18, 40, 22); key.castShadow = true; key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 150 }); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x1a1d21, 0.35));
+const model = SC.build(THREE); scene.add(model.root);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.ShadowMaterial({ opacity: 0.3 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+function camAt(az, el, dist, tx, ty, tz) { cam.position.set(tx + dist * Math.cos(el) * Math.sin(az), ty + dist * Math.sin(el), tz + dist * Math.cos(el) * Math.cos(az)); cam.lookAt(tx, ty, tz); }
+function render3d(groundY) { ground.position.y = groundY; renderer.render(scene, cam); ctx.drawImage(glc, 0, 0); }
+function project(id) { const b = new THREE.Box3().setFromObject(model.parts[id].g); const v = b.getCenter(new THREE.Vector3()).project(cam); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; }
+const pr = SC.makePocketRenderer(240);
+
+/* ---- outils 2D ---- */
+function bg(glow) { const g = ctx.createRadialGradient(W * .68, H * .45, 40, W * .68, H * .45, W * .7); g.addColorStop(0, glow || '#16243a'); g.addColorStop(1, C.bg); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(255,255,255,0.035)'; ctx.lineWidth = 1; for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x + .5, 0); ctx.lineTo(x + .5, H); ctx.stroke(); } for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); } }
+function txt(s, x, y, font, color, align, alpha) { ctx.save(); ctx.globalAlpha = alpha === undefined ? 1 : alpha; ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align || 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y); ctx.restore(); }
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function chip(x, y, label, color, alpha) { ctx.save(); ctx.globalAlpha = alpha; ctx.font = `600 15px ${MONO}`; const w = ctx.measureText(label).width + 22; rrect(x, y, w, 30, 6); ctx.fillStyle = color; ctx.fill(); ctx.fillStyle = '#14100a'; ctx.textBaseline = 'middle'; ctx.fillText(label, x + 11, y + 16); ctx.restore(); return w; }
+function sceneTag(n, fr, en, a) { chip(56, 48, n, C.accent, a); txt(fr.toUpperCase(), 56 + 52, 69, `600 15px ${MONO}`, C.ink, 'left', a); ctx.font = `600 15px ${MONO}`; const w = ctx.measureText(fr.toUpperCase()).width; txt('· ' + en.toUpperCase(), 56 + 62 + w, 69, `500 15px ${MONO}`, C.muted, 'left', a); }
+
+/* ---- sous-titres bilingues ---- */
+const CAPS = [
+  [1.5, 6.6, 'Dossier technique bilingue du compresseur scroll', 'Bilingual technical file on the scroll compressor'],
+  [7.3, 12, 'Le compresseur est le cœur de la climatisation de la voiture.', 'The compressor is the heart of the car’s air conditioning.'],
+  [12, 17, 'Il aspire le gaz froid à basse pression et le refoule chaud à haute pression.', 'It draws in cold low-pressure gas and pushes it out hot at high pressure.'],
+  [17.3, 24, 'Vue éclatée : 38 références CATIA, du couvercle à l’embrayage.', 'Exploded view: 38 CATIA parts, from rear head to clutch.'],
+  [24, 35, 'Les pièces principales', 'The main components'],
+  [35.3, 39, 'Aspiration : le gaz entre par la périphérie des spirales.', 'Intake: gas enters at the outside of the spirals.'],
+  [39, 43.5, 'La volute mobile orbite sans tourner sur elle-même et emprisonne des poches.', 'The orbiting scroll orbits without spinning and traps pockets of gas.'],
+  [43.5, 48, 'Les poches avancent vers le centre : le volume baisse, la pression monte.', 'Pockets move to the centre: volume goes down, pressure goes up.'],
+  [48, 52, 'Au centre, le gaz sort par le clapet anti-retour.', 'At the centre, gas leaves through the non-return valve.'],
+  [52.3, 57, 'Bobine coupée : la poulie tourne seule, l’arbre reste à l’arrêt.', 'Coil off: the pulley spins on its own, the shaft stays still.'],
+  [57, 62, 'Bobine en 12 V : le plateau est attiré contre la poulie, le compresseur tourne.', 'Coil at 12 V: the plate is pulled onto the pulley and the compressor runs.'],
+  [62.3, 67, 'Compression continue, moins de bruit, meilleur rendement.', 'Continuous compression, lower noise, higher efficiency.']
+];
+function captions(t) {
+  const c = CAPS.find(c => t >= c[0] && t < c[1]); if (!c) return; const a = Math.min(seg(t, c[0], c[0] + .35), 1 - seg(t, c[1] - .35, c[1]));
+  ctx.save(); ctx.globalAlpha = a; const g = ctx.createLinearGradient(0, H - 150, 0, H); g.addColorStop(0, 'rgba(10,15,20,0)'); g.addColorStop(1, 'rgba(10,15,20,0.92)'); ctx.fillStyle = g; ctx.fillRect(0, H - 150, W, 150); ctx.restore();
+  txt(c[2], W / 2, H - 66, `600 30px ${BODY}`, '#ffffff', 'center', a);
+  txt(c[3], W / 2, H - 30, `italic 400 23px ${BODY}`, C.accent, 'center', a);
+}
+
+/* ---- scènes ---- */
+const KEYS = [['voluteFixe', 'Volute fixe', 'Fixed scroll'], ['voluteMobile', 'Volute mobile', 'Orbiting scroll'], ['billes', 'Billes anti-rotation', 'Anti-rotation balls'], ['axe', 'Axe excentrique', 'Eccentric shaft'], ['corps', 'Corps', 'Housing'], ['electro', 'Électro-aimant', 'Electromagnet'], ['poulie', 'Poulie poly-V', 'Poly-V pulley'], ['embrayage', 'Plateau d’embrayage', 'Clutch plate']];
+function resetModel() { const s = model.state; s.explode = 0; s.gap = 0; s.theta = 0; s.pulley = 0; model.root.rotation.set(0, 0, 0); model.setClip([]); model.highlight(null, 0); model.root.updateMatrixWorld(true); }
+
+function sTitle(t) { // 0–7
+  bg('#15263d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
+  cam.setViewOffset(W, H, -W * 0.2, 0, W, H); camAt(0.6 + t * 0.12, 0.3, 64, 0, 9.5, 0); render3d(-0.45); cam.clearViewOffset();
+  const a = eout(seg(t, .3, 1.4));
+  txt('DOSSIER TECHNIQUE · SAÉ 1.1 · BUT GMP', 72, 210, `500 17px ${MONO}`, C.muted, 'left', a);
+  ctx.save(); ctx.globalAlpha = a; ctx.font = `900 112px ${DISP}`; ctx.fontStretch = 'expanded'; ctx.fillStyle = C.ink; ctx.fillText('Compresseur', 66 - (1 - a) * 30, 320); ctx.fillStyle = C.accent; ctx.fillText('scroll', 66 - (1 - a) * 30, 430); ctx.restore();
+  txt('Scroll compressor', 72, 486, `600 34px ${DISP}`, C.muted, 'left', eout(seg(t, 1.0, 2.0)));
+}
+function sLoop(t) { // 7–17
+  bg('#112033'); const a = eout(seg(t, 7, 7.8)); sceneTag('01', 'Rôle', 'Function', a);
+  const boxes = [[200, 340, 'Compresseur', 'Compressor', true], [560, 150, 'Condenseur', 'Condenser'], [920, 340, 'Détendeur', 'Expansion valve'], [560, 520, 'Évaporateur', 'Evaporator']];
+  const hp = [[200, 340], [200, 150], [560, 150], [920, 150], [920, 340]], lp = [[920, 340], [920, 520], [560, 520], [200, 520], [200, 340]];
+  const pipe = (pts, col, lag) => { ctx.save(); ctx.globalAlpha = a * .35; ctx.strokeStyle = col; ctx.lineWidth = 12; ctx.lineJoin = 'round'; ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); ctx.restore();
+    let L = 0; const segs = []; for (let i = 1; i < pts.length; i++) { const l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); segs.push([pts[i - 1], pts[i], L, l]); L += l; }
+    ctx.fillStyle = col; for (let d = ((t - 7) * 140 + lag) % 34; d < L; d += 34) { const s = segs.find(s => d >= s[2] && d < s[2] + s[3]); const k = (d - s[2]) / s[3]; ctx.globalAlpha = a; ctx.beginPath(); ctx.arc(s[0][0] + (s[1][0] - s[0][0]) * k, s[0][1] + (s[1][1] - s[0][1]) * k, 4.5, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; };
+  pipe(hp, C.hp, 0); pipe(lp, C.lp, 0);
+  boxes.forEach((b, i) => { const ba = eout(seg(t, 7.2 + i * .25, 7.8 + i * .25)); ctx.save(); ctx.globalAlpha = ba; rrect(b[0] - 120, b[1] - 46, 240, 92, 14); ctx.fillStyle = b[4] ? C.accent : C.panel; ctx.fill(); if (!b[4]) { ctx.strokeStyle = '#3a4a5a'; ctx.lineWidth = 2; ctx.stroke(); } ctx.restore();
+    txt(b[2], b[0], b[1] - 2, `700 24px ${DISP}`, b[4] ? '#1a1205' : C.ink, 'center', ba); txt(b[3], b[0], b[1] + 26, `italic 400 17px ${BODY}`, b[4] ? '#3d2a0a' : C.muted, 'center', ba); });
+  txt('HP ≈ 15 bar · 80 °C', 222, 250, `600 18px ${MONO}`, C.hp, 'left', a); txt('BP / LP ≈ 2 bar · 5 °C', 222, 455, `600 18px ${MONO}`, C.lp, 'left', a);
+}
+function sExplode(t) { // 17–35
+  bg('#14202e'); resetModel(); const s = model.state; model.root.rotation.z = -Math.PI / 2;
+  const e = ease(seg(t, 19, 24)); s.explode = e * 0.62 / s.spread; s.spread = 0.62; s.explode = e;
+  s.theta = (t - 17) * 1.2; s.pulley = (t - 17) * 1.2; model.apply();
+  const ci = Math.floor((t - 24) / 1.37); const cur = t >= 24 && ci < KEYS.length ? KEYS[ci] : null;
+  model.highlight(cur ? cur[0] : null, 0xf2a93b); model.root.updateMatrixWorld(true);
+  const dist = 50 + e * 44, tx = 2 + e * 8; camAt(0.5 + (t - 17) * 0.025, 0.28, dist, tx, 7.5 - e * 1, 0); render3d(-6.4);
+  sceneTag('02', 'Vue éclatée', 'Exploded view', eout(seg(t, 17, 17.8)));
+  if (cur) { const la = Math.min(eout(seg(t, 24 + ci * 1.37, 24.3 + ci * 1.37)), 1 - seg(t, 23.1 + (ci + 1) * 1.37, 24 + (ci + 1) * 1.37)); const [px, py] = project(cur[0]);
+    const lx = clamp(px + (py > H / 2 ? -40 : 40), 140, W - 340), ly = py > H / 2 ? py - 150 : py + 120;
+    ctx.save(); ctx.globalAlpha = la; ctx.strokeStyle = C.accent; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(lx, ly); ctx.lineTo(lx + 20, ly); ctx.stroke();
+    ctx.fillStyle = C.accent; ctx.beginPath(); ctx.arc(px, py, 7, 0, 7); ctx.fill(); ctx.globalAlpha = la * .35; ctx.beginPath(); ctx.arc(px, py, 14, 0, 7); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.globalAlpha = la; ctx.font = `700 28px ${DISP}`; const w = Math.max(ctx.measureText(cur[1]).width, 180) + 36; rrect(lx + 20, ly - 38, w, 76, 10); ctx.fillStyle = 'rgba(19,27,35,0.92)'; ctx.fill(); ctx.strokeStyle = C.accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+    txt(cur[1], lx + 38, ly - 2, `700 28px ${DISP}`, C.ink, 'left', la); txt(cur[2], lx + 38, ly + 26, `italic 400 19px ${BODY}`, C.accent, 'left', la);
+    txt(String(SC.REP[cur[0]]).padStart(2, '0'), lx + 20 + w - 12, ly - 14, `600 15px ${MONO}`, C.muted, 'right', la); }
+}
+function sPockets(t) { // 35–52
+  bg('#16182b'); const a = eout(seg(t, 35, 35.8)); sceneTag('03', 'Fonctionnement', 'How it works', a);
+  const th = (t - 35) * 2.1; const size = 560, x0 = 110, y0 = 104;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x0, y0); pr.draw(ctx, size, th, { lp: C.lp, hp: C.hp, mid: C.mid, fixed: '#9aa4ad', mobile: '#d9b56d', edge: 'rgba(0,0,0,.4)', showOrbit: true, orbitColor: '#f6d38f' }); ctx.restore();
+  const steps = [['Aspiration', 'Intake'], ['Translation circulaire', 'Circular translation'], ['Compression', 'Compression'], ['Refoulement', 'Outlet']];
+  const k = t < 39 ? 0 : t < 43.5 ? 1 : t < 48 ? 2 : 3;
+  steps.forEach((s, i) => { const y = 180 + i * 104, on = i === k, sa = a * eout(seg(t, 35.4 + i * .2, 36 + i * .2)); ctx.save(); ctx.globalAlpha = sa; rrect(760, y, 440, 84, 12); ctx.fillStyle = on ? 'rgba(242,169,59,0.14)' : C.panel; ctx.fill(); ctx.strokeStyle = on ? C.accent : '#2a3744'; ctx.lineWidth = on ? 2 : 1; ctx.stroke();
+    rrect(778, y + 18, 48, 48, 9); ctx.fillStyle = on ? C.accent : '#1d2833'; ctx.fill(); ctx.restore();
+    txt(String(i + 1), 802, y + 51, `700 24px ${MONO}`, on ? '#1a1205' : C.ink, 'center', sa); txt(s[0], 846, y + 40, `700 24px ${DISP}`, C.ink, 'left', sa); txt(s[1], 846, y + 66, `italic 400 17px ${BODY}`, on ? C.accent : C.muted, 'left', sa); });
+  const g = ctx.createLinearGradient(760, 0, 1000, 0); g.addColorStop(0, C.lp); g.addColorStop(.5, C.mid); g.addColorStop(1, C.hp);
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = g; rrect(760, 610, 240, 10, 5); ctx.fill(); ctx.restore();
+  txt('BP / LP', 760, 600, `600 14px ${MONO}`, C.lp, 'left', a); txt('HP', 1000, 600, `600 14px ${MONO}`, C.hp, 'right', a);
+}
+function sClutch(t) { // 52–62
+  bg('#1b1a24'); resetModel(); const s = model.state; const on = t >= 57; const k = on ? eout(seg(t, 57, 57.35)) : 0;
+  s.gap = 0.45 * (1 - k); s.pulley = (t - 52) * 7; s.theta = on ? (t - 57) * 7 * k : 0; model.apply();
+  model.setClip([clip]); model.root.updateMatrixWorld(true);
+  const coil = model.parts.electro.g; coil.traverse(o => { if (o.isMesh) { o.material.emissive.setHex(on ? 0xff3a10 : 0x000000); o.material.emissiveIntensity = on ? 0.6 : 1; } });
+  camAt(0.35 + (t - 52) * 0.02, 0.42, 34, 0, 14.5, 0); render3d(-0.45);
+  sceneTag('04', 'Poulie débrayable', 'Clutch pulley', eout(seg(t, 52, 52.8)));
+  const x = 980, y = 170; ctx.save(); rrect(x, y, 230, 120, 14); ctx.fillStyle = 'rgba(19,27,35,0.92)'; ctx.fill(); ctx.strokeStyle = on ? '#3fbf7f' : '#3a4a5a'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore();
+  txt(on ? '12 V' : '0 V', x + 24, y + 58, `700 40px ${MONO}`, on ? '#3fbf7f' : C.muted); txt(on ? 'EMBRAYÉ · ENGAGED' : 'DÉBRAYÉ · DISENGAGED', x + 24, y + 92, `600 14px ${MONO}`, on ? '#3fbf7f' : C.muted);
+}
+function sHistory(t) { // 62–72
+  bg('#141c26'); sceneTag('05', 'Histoire', 'History', eout(seg(t, 62, 62.8)));
+  const ev = [['1905', 'Léon Creux', 'Brevet France + USA', 'Patent in France and the US'], ['1945+', 'Machines-outils', 'Précision enfin suffisante', 'Precision finally good enough'], ['1975', 'Niels Young', 'Étanchéité radiale', 'Radial compliance'], ['1981', 'Sanden', '1er scroll automobile', 'First automotive scroll'], ['1983', 'Hitachi', '1er climatiseur scroll', 'First scroll room A/C']];
+  const x0 = 110, x1 = 1170, y = 330; const la = eout(seg(t, 62.4, 64)); ctx.save(); ctx.strokeStyle = '#3a4a5a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + (x1 - x0) * la, y); ctx.stroke(); ctx.restore();
+  ev.forEach((e, i) => { const x = x0 + i * (x1 - x0) / 4.6, a = eout(seg(t, 63 + i * 1.3, 63.6 + i * 1.3)); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.bg; ctx.strokeStyle = C.accent; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, 11, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore();
+    txt(e[0], x - 10, y - 40 - (1 - a) * 20, `700 46px ${MONO}`, C.ink, 'left', a); txt(e[1], x - 10, y + 56, `700 24px ${DISP}`, C.accent, 'left', a); txt(e[2], x - 10, y + 88, `400 18px ${BODY}`, C.ink, 'left', a); txt(e[3], x - 10, y + 114, `italic 400 16px ${BODY}`, C.muted, 'left', a); });
+}
+function sOutro(t) { // 72–82
+  bg('#15263d'); resetModel(); const s = model.state; s.theta = t * 5; s.pulley = t * 5; model.apply();
+  if (t < 77) {
+    sceneTag('05', 'Avantages', 'Advantages', eout(seg(t, 72, 72.8)));
+    const adv = [['Compression continue', 'Continuous compression', C.lp], ['Moins de bruit', 'Lower noise levels', C.mid], ['Meilleur rendement', 'Increased efficiency', C.hp]];
+    adv.forEach((d, i) => { const a = eout(seg(t, 72.5 + i * .6, 73.2 + i * .6)) * (1 - seg(t, 76.5, 77)); const x = 90 + i * 380, y = 250 - (1 - a) * 30; ctx.save(); ctx.globalAlpha = a; rrect(x, y, 340, 190, 16); ctx.fillStyle = C.panel; ctx.fill(); ctx.strokeStyle = d[2]; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = d[2]; rrect(x + 28, y + 30, 46, 8, 4); ctx.fill(); ctx.restore();
+      txt(d[0], x + 28, y + 100, `800 26px ${DISP}`, C.ink, 'left', a); txt(d[1], x + 28, y + 140, `italic 400 21px ${BODY}`, d[2], 'left', a); });
+  } else {
+    cam.setViewOffset(W, H, W * 0.2, 0, W, H); camAt(0.6 + t * 0.1, 0.3, 60, 0, 9.5, 0); render3d(-0.45); cam.clearViewOffset();
+    const a = eout(seg(t, 77, 78));
+    ctx.save(); ctx.globalAlpha = a; ctx.font = `900 92px ${DISP}`; ctx.fillStyle = C.ink; ctx.textAlign = 'right'; ctx.fillText('Compresseur', W - 70, 300); ctx.fillStyle = C.accent; ctx.fillText('scroll', W - 70, 392); ctx.restore();
+    txt('Scroll compressor', W - 72, 444, `600 30px ${DISP}`, C.muted, 'right', a);
+    txt('SAÉ 1.1 · ANALYSE DE PRODUIT GRAND PUBLIC · BUT GMP', W - 72, 520, `500 16px ${MONO}`, C.muted, 'right', a);
+  }
+}
+const SCENES = [[0, 7, sTitle], [7, 17, sLoop], [17, 35, sExplode], [35, 52, sPockets], [52, 62, sClutch], [62, 72, t => sOutro(t + 10)]];
+function renderAt(t) {
+  const sc = SCENES.find(s => t >= s[0] && t < s[1]) || SCENES[SCENES.length - 1]; sc[2](t); captions(t);
+  // fondu entre scènes
+  let f = 0; SCENES.forEach(s => { if (s[0] > 0) f = Math.max(f, 1 - Math.abs(t - s[0]) / 0.3); }); f = Math.max(f, 1 - t / 0.5, seg(t, DUR - 0.8, DUR));
+  if (f > 0) { ctx.fillStyle = `rgba(0,0,0,${clamp(f)})`; ctx.fillRect(0, 0, W, H); }
+}
+
+/* ---- musique générée ---- */
+async function music() {
+  const SR = 48000, oc = new OfflineAudioContext(2, SR * DUR, SR), master = oc.createGain(); master.connect(oc.destination);
+  master.gain.setValueAtTime(0, 0); master.gain.linearRampToValueAtTime(0.9, 2.5); master.gain.setValueAtTime(0.9, DUR - 3); master.gain.linearRampToValueAtTime(0, DUR - 0.2);
+  const lpf = oc.createBiquadFilter(); lpf.type = 'lowpass'; lpf.frequency.value = 1100; lpf.Q.value = 0.6; lpf.connect(master);
+  const hz = m => 440 * 2 ** ((m - 69) / 12);
+  const prog = [[57, 60, 64], [53, 57, 60], [48, 52, 55, 60], [55, 59, 62]]; // Am F C G
+  for (let b = 0, t0 = 0; t0 < DUR; b++, t0 += 5) { const ch = prog[b % 4];
+    ch.forEach(n => [-6, 6].forEach(det => { const o = oc.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz(n); o.detune.value = det; const g = oc.createGain(); g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(0.018, t0 + 1.4); g.gain.setValueAtTime(0.018, t0 + 4.2); g.gain.linearRampToValueAtTime(0, t0 + 5.6); o.connect(g); g.connect(lpf); o.start(t0); o.stop(t0 + 5.7); }));
+    const bo = oc.createOscillator(); bo.type = 'sine'; bo.frequency.value = hz(ch[0] - 12); const bg = oc.createGain(); bg.gain.setValueAtTime(0, t0); bg.gain.linearRampToValueAtTime(0.11, t0 + 0.6); bg.gain.setValueAtTime(0.11, t0 + 4.4); bg.gain.linearRampToValueAtTime(0, t0 + 5.3); bo.connect(bg); bg.connect(master); bo.start(t0); bo.stop(t0 + 5.4); }
+  const noise = oc.createBuffer(1, SR * 2, SR); { const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+  const hat = oc.createBiquadFilter(); hat.type = 'highpass'; hat.frequency.value = 7000; hat.connect(master);
+  for (let t = 7; t < DUR - 4; t += 0.5) { const s = oc.createBufferSource(); s.buffer = noise; const g = oc.createGain(); const v = (Math.round(t * 2) % 2) ? 0.012 : 0.022; g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09); s.connect(g); g.connect(hat); s.start(t, Math.random(), 0.1); }
+  for (let t = 7; t < DUR - 4; t += 1) { const o = oc.createOscillator(); o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.18); const g = oc.createGain(); g.gain.setValueAtTime(0.16, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.25); o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.3); }
+  { const s = oc.createBufferSource(); s.buffer = noise; s.loop = true; const f = oc.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 3; f.frequency.setValueAtTime(300, 19); f.frequency.exponentialRampToValueAtTime(3500, 23.5); const g = oc.createGain(); g.gain.setValueAtTime(0, 19); g.gain.linearRampToValueAtTime(0.12, 22); g.gain.linearRampToValueAtTime(0, 24.2); s.connect(f); f.connect(g); g.connect(master); s.start(19); s.stop(24.5); }
+  { const o = oc.createOscillator(); o.frequency.setValueAtTime(160, 57); o.frequency.exponentialRampToValueAtTime(50, 57.15); const g = oc.createGain(); g.gain.setValueAtTime(0.5, 57); g.gain.exponentialRampToValueAtTime(0.0001, 57.4); o.connect(g); g.connect(master); o.start(57); o.stop(57.5); }
+  return oc.startRendering();
+}
+
+/* ---- encodage ---- */
+async function run() {
+  await document.fonts.load(`900 100px ${DISP}`); await document.fonts.load(`600 20px ${BODY}`); await document.fonts.load(`italic 400 20px ${BODY}`); await document.fonts.load(`600 16px ${MONO}`); await document.fonts.ready;
+  let vcodec = null; for (const c of ['avc1.640028', 'avc1.4d0028', 'avc1.42002a']) { const r = await VideoEncoder.isConfigSupported({ codec: c, width: W, height: H, bitrate: 1.15e6, framerate: FPS }); if (r.supported) { vcodec = c; break; } }
+  if (!vcodec) { log('H.264 indisponible'); return; }
+  let acfg = { codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 96000 }; let audio = false;
+  try { audio = (await AudioEncoder.isConfigSupported(acfg)).supported; } catch (e) { audio = false; }
+  log('codec ' + vcodec + ' audio ' + audio);
+  const muxer = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H, frameRate: FPS }, audio: audio ? { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 } : undefined, fastStart: 'in-memory' });
+  const venc = new VideoEncoder({ output: (c, m) => muxer.addVideoChunk(c, m), error: e => log('ERR ' + e.message) });
+  venc.configure({ codec: vcodec, width: W, height: H, bitrate: 1.15e6, bitrateMode: 'variable', latencyMode: 'quality', framerate: FPS, avc: { format: 'avc' } });
+  const N = Math.round(DUR * FPS), t0 = performance.now();
+  for (let i = 0; i < N; i++) {
+    renderAt(i / FPS);
+    const fr = new VideoFrame(out, { timestamp: Math.round(i * 1e6 / FPS), duration: Math.round(1e6 / FPS) }); venc.encode(fr, { keyFrame: i % 60 === 0 }); fr.close();
+    while (venc.encodeQueueSize > 6) await new Promise(r => venc.addEventListener('dequeue', r, { once: true }));
+    if (i % 90 === 0) { log(`image ${i}/${N} · ${((performance.now() - t0) / 1000).toFixed(0)} s`); await new Promise(r => { const c = new MessageChannel(); c.port1.onmessage = () => r(); c.port2.postMessage(0); }); }
+  }
+  await venc.flush();
+  if (audio) {
+    log('audio…'); const buf = await music();
+    const aenc = new AudioEncoder({ output: (c, m) => muxer.addAudioChunk(c, m), error: e => log('AERR ' + e.message) }); aenc.configure(acfg);
+    const L = buf.getChannelData(0), R = buf.getChannelData(1), F = 4800;
+    for (let s = 0; s < L.length; s += F) { const n = Math.min(F, L.length - s); const d = new Float32Array(n * 2); d.set(L.subarray(s, s + n), 0); d.set(R.subarray(s, s + n), n);
+      const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(s / 48000 * 1e6), data: d }); aenc.encode(ad); ad.close(); }
+    await aenc.flush();
+  }
+  muxer.finalize(); const blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
+  log('envoi ' + (blob.size / 1e6).toFixed(1) + ' Mo');
+  const r = await fetch('/save/scroll-compressor.mp4', { method: 'POST', body: blob }); log('TERMINÉ ' + (await r.text()));
+  window.DONE = true;
+}
+window.renderAt = renderAt; window.run = run;
+document.fonts.ready.then(() => { renderAt(0.01); log('prêt'); });
+</script></body></html>
