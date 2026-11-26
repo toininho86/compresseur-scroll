@@ -249,6 +249,23 @@ select{font:500 1rem var(--f-mono);padding:8px 10px;border:1px solid var(--line2
 .sheet-grid tr.hl b{color:var(--ok);font-size:1.05rem}
 .sheet-foot{padding:14px 22px;font-size:.82rem;color:var(--muted);max-width:none}
 .revs{max-width:720px;margin-bottom:14px}
+/* nomenclature */
+.bomtools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.bomtools .chip{cursor:pointer;font-family:var(--f-body)}
+.bomtools .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.bomcount{font-size:.8rem;color:var(--muted)}
+table.bom{min-width:900px}
+.bom td{font-size:.86rem}
+.bom td.rep{font:700 .85rem var(--f-mono);color:var(--accent-ink)}
+.bom td small{display:block;color:var(--muted);font-size:.76rem;font-style:italic}
+.bom td.rho{font-family:var(--f-mono);white-space:nowrap}
+.bom td.cat{font:500 .74rem var(--f-mono);color:var(--muted)}
+.bom tbody tr{cursor:pointer}
+.bom tbody tr:hover td{background:var(--panel2)}
+.bom tbody tr.sel td{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.bom .mat{display:flex;gap:8px;align-items:center}
+.bom .mat i{width:10px;height:10px;border-radius:50%;flex:none}
+th .u{font-weight:400;text-transform:none;letter-spacing:0}
 .kbd{font:600 .7rem var(--f-mono);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink)}
 @media (max-width:980px){.sheet-grid{grid-template-columns:1fr}.sheet-grid table:nth-child(odd){border-right:0}.tblock .wrap{grid-template-columns:repeat(3,minmax(0,1fr))}.tblock .wrap>div{border-bottom:1px solid var(--line)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dial{display:flex;gap:18px;flex-wrap:wrap}
@@ -595,6 +612,15 @@ footer .wrap{display:grid;gap:10px}
   </div>
   <p style="margin-top:14px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Raccourcis :</span><span data-l="en">Shortcuts:</span> <span class="kbd">E</span> <span data-l="fr">éclater</span><span data-l="en">explode</span> · <span class="kbd">C</span> <span data-l="fr">coupe</span><span data-l="en">section</span> · <span class="kbd">R</span> <span data-l="fr">tourner</span><span data-l="en">run</span> · <span class="kbd">B</span> <span data-l="fr">repères</span><span data-l="en">balloons</span> · <span class="kbd">I</span> <span data-l="fr">isoler</span><span data-l="en">isolate</span> · <span class="kbd">V</span> <span data-l="fr">vue</span><span data-l="en">view</span> · <span class="kbd">Échap</span></p>
   <p style="margin-top:6px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Cliquez une pièce (ou son nom) pour voir sa fonction, son matériau et son procédé d’obtention. Molette ou pincement pour zoomer, clic droit ou deux doigts pour déplacer. Modèle redessiné d’après les fichiers CATIA du TP, dans l’ordre de l’éclaté linéaire ; formes simplifiées, couleurs pédagogiques (volute mobile en doré).</span><span data-l="en">Click a part (or its name) to see its function, material and manufacturing process. Wheel or pinch to zoom, right-click or two fingers to pan. Model redrawn from the lab’s CATIA files, in the order of the linear exploded view; simplified shapes, teaching colours (orbiting scroll in gold).</span></p>
+  <h3 class="sub"><span data-l="fr">Nomenclature et matériaux</span><span data-l="en">Bill of materials</span></h3>
+  <div class="bomtools">
+    <div class="chips" id="bomFilter"></div>
+    <span class="bomcount mono" id="bomCount"></span>
+  </div>
+  <div class="tablewrap"><table class="bom" id="bom">
+    <thead><tr><th>Rep.</th><th><span data-l="fr">Désignation</span><span data-l="en">Part</span></th><th><span data-l="fr">Qté</span><span data-l="en">Qty</span></th><th><span data-l="fr">Matériau probable</span><span data-l="en">Likely material</span></th><th><span class="u">ρ g/cm³</span></th><th><span data-l="fr">Procédé d’obtention</span><span data-l="en">Manufacturing process</span></th><th><span data-l="fr">Fichier CATIA</span><span data-l="en">CATIA file</span></th></tr></thead>
+    <tbody></tbody></table></div>
+  <p class="note" style="margin-top:14px"><span data-l="fr">Les fichiers CATIA du TP ne contiennent aucun matériau (paramètre « Material » vide). Ces matériaux sont déduits de la fonction de chaque pièce et des pratiques courantes pour ce type de compresseur. La colonne ρ donne la masse volumique attendue : comparez-la à vos pesées (section Matériaux) pour confirmer ou corriger. Cliquez une ligne pour voir la pièce en 3D.</span><span data-l="en">The lab’s CATIA files contain no material (empty “Material” parameter). These materials are inferred from each part’s function and common practice for this type of compressor. The ρ column gives the expected density: compare it with your weighings (Materials section) to confirm or correct. Click a row to see the part in 3D.</span></p>
 </div></section>
 
 <!-- 05 -->
@@ -995,8 +1021,21 @@ function renderList(){
   el.innerHTML = h; el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => select(b.dataset.id === selected ? null : b.dataset.id)));
 }
 function applyIso(){ view.model.setOpacity(id => (!iso || !selected || id === selected) ? 1 : 0.1); }
-function select(id){ selected = id; view.model.highlight(selected, 0xf2a93b); applyIso(); renderInfo(); document.querySelectorAll('#vList button').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === selected))); const b = document.querySelector(`#vList button[data-id="${id}"]`); if (b) b.scrollIntoView({ block: 'nearest' }); }
+function select(id){ selected = id; view.model.highlight(selected, 0xf2a93b); applyIso(); renderInfo(); document.querySelectorAll('#bom tbody tr').forEach(tr => tr.classList.toggle('sel', tr.dataset.id === selected)); document.querySelectorAll('#vList button').forEach(b => b.setAttribute('aria-current', String(b.dataset.id === selected))); const b = document.querySelector(`#vList button[data-id="${id}"]`); if (b) b.scrollIntoView({ block: 'nearest' }); }
 listeners.push(renderInfo, renderList);
+/* nomenclature complète */
+const FAM = { alu: ['corps', 'couvercle', 'voluteFixe', 'voluteMobile'], cu: ['electro'], elast: ['jointCouvercle', 'grandJoint', 'jointSPI'], poly: ['capteur', 'patins'] };
+const FAMS = { all: { fr: 'Toutes', en: 'All', c: 'transparent' }, alu: { fr: 'Alliages d’aluminium', en: 'Aluminium alloys', c: '#c4ccd3' }, steel: { fr: 'Aciers', en: 'Steels', c: '#6f7a85' }, cu: { fr: 'Cuivre', en: 'Copper', c: '#c8763a' }, elast: { fr: 'Élastomères', en: 'Elastomers', c: '#2f3236' }, poly: { fr: 'Polymères', en: 'Polymers', c: '#8a6fb0' } };
+const famOf = id => Object.keys(FAM).find(f => FAM[f].includes(id)) || 'steel';
+const RHO = { corps: '2,76', couvercle: '2,76', voluteFixe: '2,73', voluteMobile: '2,73', electro: '≈ 8 (Cu + acier)', jointCouvercle: '1,25', grandJoint: '1,25', jointSPI: '≈ 2 (HNBR + acier)', capteur: '≈ 1,4', patins: '7,85 / ≈ 1,4', roulementExc: '7,81', roulement3547: '7,81', roulement1228: '7,81', roulement3552: '7,81', billes: '7,81', masselotte: '7,8', gicleur: '7,85 / 8,5' };
+let bomFam = 'all';
+function renderBom(){ const o = LANG === 'fr' ? 'en' : 'fr', rows = SC.PARTS.slice().sort((a, b) => repOf(a.id) - repOf(b.id)).filter(p => bomFam === 'all' || famOf(p.id) === bomFam);
+  document.querySelector('#bom tbody').innerHTML = rows.map(p => { const r = RHO[p.id] || '7,85'; return `<tr data-id="${p.id}" class="${p.id === selected ? 'sel' : ''}"><td class="rep">${String(repOf(p.id)).padStart(2, '0')}</td><td><b>${T(p.name)}</b><small>${p.name[o]}</small></td><td class="mono">${p.qty}</td><td><span class="mat"><i style="background:${FAMS[famOf(p.id)].c}"></i>${T(p.mat)}</span></td><td class="rho">${LANG === 'fr' ? r : r.replace(/(\d),(\d)/g, '$1.$2')}</td><td>${T(p.proc)}</td><td class="cat">${p.cat}</td></tr>`; }).join('');
+  document.querySelectorAll('#bom tbody tr').forEach(tr => tr.addEventListener('click', () => { select(tr.dataset.id); document.getElementById('eclate').querySelector('.viewer').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); }));
+  const cnt = rows.reduce((s, p) => s + p.qty, 0); document.getElementById('bomCount').textContent = `${rows.length} ${LANG === 'fr' ? 'références' : 'part numbers'} · ${cnt} ${LANG === 'fr' ? 'pièces' : 'parts'}`;
+  document.getElementById('bomFilter').innerHTML = Object.keys(FAMS).map(f => `<button type="button" class="chip" data-f="${f}" aria-pressed="${f === bomFam}">${f !== 'all' ? `<i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:${FAMS[f].c}"></i>` : ''}${T(FAMS[f])}</button>`).join('');
+  document.querySelectorAll('#bomFilter button').forEach(b => b.addEventListener('click', () => { bomFam = b.dataset.f; renderBom(); })); }
+listeners.push(renderBom);
 const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListener('click', () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); fn(on); }); };
 tog('vRun', on => running = on);
 tog('vCut', on => { cut = on; view.model.setClip(on ? [clipPlane] : []); });
