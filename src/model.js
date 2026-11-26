@@ -10,6 +10,13 @@
     const k = phi - alpha;
     return [A * (Math.cos(phi) + k * Math.sin(phi)), A * (Math.sin(phi) - k * Math.cos(phi))];
   }
+  SC.geo.h = 2.4; SC.geo.pitch = 2 * Math.PI * A; SC.geo.turns = (PHI1 - PHI0) / (2 * Math.PI);
+  // point (x, y) dans la paroi de la volute fixe ?
+  SC.inFixedWall = function (x, y) {
+    const rho = Math.hypot(x, y), u2 = (rho / A) ** 2 - 1; if (u2 <= 0) return false;
+    const u = Math.sqrt(u2), T2 = 2 * Math.PI; let al = Math.atan2(y, x) - (u - Math.atan(u)); al = ((al + BETA) % T2 + T2) % T2 - BETA;
+    if (al > BETA) return false; const phi = u + al; return phi >= PHI0 && phi <= PHI1;
+  };
   SC.wallOutline = function (n) {
     n = n || 420; const p = [];
     for (let i = 0; i <= n; i++) p.push(inv(PHI0 + (PHI1 - PHI0) * i / n, -BETA));

@@ -206,6 +206,59 @@ svg text{font-family:var(--f-body)}
 .asm li.cur .row b{color:var(--accent-ink)}
 .asm li.todo{opacity:.5}
 .pv svg text{font:11px var(--f-mono);fill:var(--muted)}
+/* numérotation des figures */
+main{counter-reset:fig}
+figcaption::before{counter-increment:fig;content:"Fig. " counter(fig) " — ";font:600 .74rem var(--f-mono);letter-spacing:.06em;color:var(--accent-ink)}
+/* cartouche */
+.tblock{border-top:1px solid var(--line2);background:color-mix(in srgb,var(--panel) 80%,transparent)}
+.tblock .wrap{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding-block:0}
+.tblock .wrap>div{padding:10px 14px;border-right:1px solid var(--line);display:grid;gap:2px;min-width:0}
+.tblock .wrap>div:first-child{border-left:1px solid var(--line)}
+.tblock span{font:500 .62rem/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tblock b{font:600 .86rem var(--f-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* géométrie */
+h3.sub{font-size:1.5rem;font-stretch:110%;margin:52px 0 18px}
+.drawing{background:var(--panel)}
+#geoSvg .dim{stroke:var(--ink);stroke-width:1.1;fill:none}
+#geoSvg .ext{stroke:var(--muted);stroke-width:.8}
+#geoSvg .axis{stroke:var(--muted);stroke-width:.8;stroke-dasharray:14 3 2 3}
+#geoSvg text{font:600 13px var(--f-mono);fill:var(--ink)}
+#geoSvg .wf{fill:url(#hFix);stroke:var(--ink);stroke-width:1.2}
+#geoSvg .wm{fill:url(#hMob);stroke:#b8862a;stroke-width:1.2}
+.eqs{display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.eq{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:baseline}
+.eq:last-child{border-bottom:0}
+.eq .f{font:500 1.02rem var(--f-mono);font-style:italic}
+.eq .v{font:600 1.05rem var(--f-mono);text-align:right;white-space:nowrap}
+.eq .v b{color:var(--accent-ink);font-size:1.25rem}
+.eq .d{grid-column:1/-1;font-size:.8rem;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.kpis>div{background:var(--panel);padding:12px 14px;display:grid;gap:2px;min-width:0}
+.kpis small{font-size:.74rem;color:var(--muted)}
+.kpis b{font:700 1.6rem/1.1 var(--f-mono);letter-spacing:-.02em}
+.kpis i{font:500 .74rem var(--f-mono);color:var(--muted);font-style:normal}
+.verdict{font-size:.88rem;padding:10px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2)}
+.verdict b{font-family:var(--f-mono)}
+select{font:500 1rem var(--f-mono);padding:8px 10px;border:1px solid var(--line2);border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+/* fiche technique */
+.sheet{border:1.5px solid var(--ink);border-radius:4px;background:var(--panel)}
+.sheet-head{display:flex;flex-wrap:wrap;gap:16px 30px;justify-content:space-between;align-items:end;padding:20px 22px;border-bottom:1.5px solid var(--ink)}
+.sheet-head h3{font-size:1.5rem;font-stretch:112%;margin-top:6px}
+.sheet-head dl{display:flex;gap:26px;margin:0}
+.sheet-head dt{font:500 .64rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sheet-head dd{margin:2px 0 0;font:700 1.15rem var(--f-mono)}
+.sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.sheet-grid table{border-bottom:1px solid var(--line)}
+.sheet-grid table:nth-child(odd){border-right:1px solid var(--line)}
+.sheet-grid th{background:var(--ink);color:var(--bg);font-size:.7rem}
+.sheet-grid td{padding:8px 14px;font-size:.88rem}
+.sheet-grid td:last-child{text-align:right}
+.sheet-grid tr.hl td{background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.sheet-grid tr.hl b{color:var(--ok);font-size:1.05rem}
+.sheet-foot{padding:14px 22px;font-size:.82rem;color:var(--muted);max-width:none}
+.revs{max-width:720px;margin-bottom:14px}
+.kbd{font:600 .7rem var(--f-mono);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink)}
+@media (max-width:980px){.sheet-grid{grid-template-columns:1fr}.sheet-grid table:nth-child(odd){border-right:0}.tblock .wrap{grid-template-columns:repeat(3,minmax(0,1fr))}.tblock .wrap>div{border-bottom:1px solid var(--line)}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dial{display:flex;gap:18px;flex-wrap:wrap}
 .dial div{display:flex;gap:10px;align-items:center;font-size:.86rem}
 .state{font:600 .82rem var(--f-mono);padding:6px 10px;border-radius:6px;background:var(--panel2);border:1px solid var(--line2)}
@@ -290,15 +343,17 @@ footer .wrap{display:grid;gap:10px}
     <nav class="nav" aria-label="Sections">
       <a href="#role"><b>01</b><span data-l="fr">Fonction</span><span data-l="en">Function</span></a>
       <a href="#fonctionnement"><b>02</b><span data-l="fr">Fonctionnement</span><span data-l="en">How it works</span></a>
-      <a href="#eclate"><b>03</b><span data-l="fr">Vue éclatée 3D</span><span data-l="en">3D exploded view</span></a>
-      <a href="#embrayage"><b>04</b><span data-l="fr">Embrayage</span><span data-l="en">Clutch</span></a>
-      <a href="#montage"><b>05</b><span data-l="fr">Montage</span><span data-l="en">Assembly</span></a>
-      <a href="#cinematique"><b>06</b><span data-l="fr">Cinématique</span><span data-l="en">Kinematics</span></a>
-      <a href="#choix"><b>07</b><span data-l="fr">Choix</span><span data-l="en">Design</span></a>
-      <a href="#materiaux"><b>08</b><span data-l="fr">Matériaux</span><span data-l="en">Materials</span></a>
-      <a href="#electro"><b>09</b><span data-l="fr">Électroaimant</span><span data-l="en">Electromagnet</span></a>
-      <a href="#video"><b>10</b><span data-l="fr">Vidéo</span><span data-l="en">Video</span></a>
-      <a href="#quiz"><b>11</b>Quiz</a>
+      <a href="#geometrie"><b>03</b><span data-l="fr">Calculs</span><span data-l="en">Engineering</span></a>
+      <a href="#eclate"><b>04</b><span data-l="fr">Vue éclatée 3D</span><span data-l="en">3D exploded view</span></a>
+      <a href="#embrayage"><b>05</b><span data-l="fr">Embrayage</span><span data-l="en">Clutch</span></a>
+      <a href="#montage"><b>06</b><span data-l="fr">Montage</span><span data-l="en">Assembly</span></a>
+      <a href="#cinematique"><b>07</b><span data-l="fr">Cinématique</span><span data-l="en">Kinematics</span></a>
+      <a href="#choix"><b>08</b><span data-l="fr">Choix</span><span data-l="en">Design</span></a>
+      <a href="#materiaux"><b>09</b><span data-l="fr">Matériaux</span><span data-l="en">Materials</span></a>
+      <a href="#electro"><b>10</b><span data-l="fr">Électroaimant</span><span data-l="en">Electromagnet</span></a>
+      <a href="#fiche"><b>11</b><span data-l="fr">Fiche technique</span><span data-l="en">Data sheet</span></a>
+      <a href="#video"><b>12</b><span data-l="fr">Vidéo</span><span data-l="en">Video</span></a>
+      <a href="#quiz"><b>13</b>Quiz</a>
     </nav>
     <div class="lang" role="group" aria-label="Langue / Language">
       <button type="button" id="btnFr" data-set-lang="fr" aria-pressed="true">FR</button>
@@ -319,6 +374,8 @@ footer .wrap{display:grid;gap:10px}
         <div><dt data-l="fr">Commande</dt><dt data-l="en">Control</dt><dd><span data-l="fr">Embrayage 12 V</span><span data-l="en">12 V clutch</span></dd></div>
         <div><dt data-l="fr">Entraînement</dt><dt data-l="en">Drive</dt><dd><span data-l="fr">Courroie poly‑V, 6 gorges</span><span data-l="en">Poly‑V belt, 6 ribs</span></dd></div>
         <div><dt data-l="fr">Nomenclature CATIA</dt><dt data-l="en">CATIA bill of materials</dt><dd><span data-l="fr">38 références</span><span data-l="en">38 part files</span></dd></div>
+        <div><dt data-l="fr">Cylindrée (calculée)</dt><dt data-l="en">Displacement (computed)</dt><dd class="mono"><span class="js-vs">49,7</span> <span data-l="fr">cm³/tr</span><span data-l="en">cm³/rev</span></dd></div>
+        <div><dt data-l="fr">Froid à 2 000 tr/min</dt><dt data-l="en">Cooling at 2,000 rpm</dt><dd class="mono"><span class="js-q">2,72</span> kW · COP <span class="js-cop">2,72</span></dd></div>
       </dl>
       <div class="cta">
         <a class="btn primary" href="#eclate"><span data-l="fr">Ouvrir la vue éclatée</span><span data-l="en">Open the exploded view</span> →</a>
@@ -330,6 +387,14 @@ footer .wrap{display:grid;gap:10px}
       <div class="hint"><span data-l="fr">Modèle 3D animé · glisser pour tourner</span><span data-l="en">Animated 3D model · drag to rotate</span></div>
     </div>
   </div>
+  <div class="tblock"><div class="wrap">
+    <div><span>Doc.</span><b>SAÉ1.1‑CS‑DT</b></div>
+    <div><span><span data-l="fr">Révision</span><span data-l="en">Revision</span></span><b>C</b></div>
+    <div><span><span data-l="fr">Unités</span><span data-l="en">Units</span></span><b>SI · mm · bar · kW</b></div>
+    <div><span>Projection</span><b><span data-l="fr">Européenne</span><span data-l="en">First angle</span></b></div>
+    <div><span><span data-l="fr">Fluide</span><span data-l="en">Fluid</span></span><b>R134a</b></div>
+    <div><span><span data-l="fr">Langues</span><span data-l="en">Languages</span></span><b>FR · EN</b></div>
+  </div></div>
 </div>
 
 <main>
@@ -452,8 +517,69 @@ footer .wrap{display:grid;gap:10px}
 </div></section>
 
 <!-- 04 -->
+<section class="s" id="geometrie"><div class="wrap">
+  <div class="sh"><div class="no">03</div><h2><span data-l="fr">Géométrie et performances</span><span data-l="en">Geometry and performance</span></h2><div class="other"><span data-l="fr">Geometry and performance</span><span data-l="en">Géométrie et performances</span></div></div>
+  <div class="cols">
+    <figure class="card drawing">
+      <svg id="geoSvg" viewBox="-320 -322 640 640" role="img" aria-label="Profil coté des spirales"></svg>
+      <figcaption><span data-l="fr">Coupe des spirales du modèle, cotée en mm. Volute fixe hachurée à 45°, volute mobile à −45°, position θ = 0°.</span><span data-l="en">Section through the model’s scrolls, dimensioned in mm. Fixed scroll hatched at 45°, orbiting scroll at −45°, position θ = 0°.</span></figcaption>
+    </figure>
+    <div class="stack">
+      <p><span data-l="fr">Tout découle de quatre cotes : le pas <i>p</i> (écart entre deux spires), l’épaisseur de paroi <i>t</i>, la hauteur des spires <i>h</i> et le nombre de tours <i>N</i>. Ces formules donnent le rayon d’orbite, la cylindrée et le rapport de volume intégré.</span><span data-l="en">Everything follows from four dimensions: the pitch <i>p</i> (distance between turns), the wall thickness <i>t</i>, the wrap height <i>h</i> and the number of turns <i>N</i>. These formulas give the orbit radius, the displacement and the built-in volume ratio.</span></p>
+      <div class="card calc">
+        <span class="tag"><span data-l="fr">Cotes du modèle · remplacez par vos mesures au pied à coulisse</span><span data-l="en">Model dimensions · enter your caliper readings</span></span>
+        <div class="fields">
+          <label for="gP"><span data-l="fr">Pas p (mm)</span><span data-l="en">Pitch p (mm)</span><input id="gP" type="number" step="0.01" value="16.34"></label>
+          <label for="gT"><span data-l="fr">Épaisseur t (mm)</span><span data-l="en">Thickness t (mm)</span><input id="gT" type="number" step="0.1" value="3.0"></label>
+          <label for="gH"><span data-l="fr">Hauteur h (mm)</span><span data-l="en">Height h (mm)</span><input id="gH" type="number" step="0.5" value="24"></label>
+          <label for="gN"><span data-l="fr">Tours N</span><span data-l="en">Turns N</span><input id="gN" type="number" step="0.05" value="2.45"></label>
+        </div>
+      </div>
+      <div class="eqs">
+        <div class="eq"><span class="f">e = p / 2 − t</span><span class="v"><b id="gE">–</b> mm</span><span class="d" data-l="fr">rayon d’orbite (excentricité)</span><span class="d" data-l="en">orbit radius (eccentricity)</span></div>
+        <div class="eq"><span class="f">V<sub>s</sub> = π · p · (p − 2t) · h · (2N − 1)</span><span class="v"><b id="gVs">–</b> <span data-l="fr">cm³/tr</span><span data-l="en">cm³/rev</span></span><span class="d" data-l="fr">cylindrée par tour d’arbre</span><span class="d" data-l="en">displacement per shaft revolution</span></div>
+        <div class="eq"><span class="f">V<sub>i</sub> ≈ (2N − 1) / (2N − 3)</span><span class="v"><b id="gVi">–</b></span><span class="d" data-l="fr">rapport de volume intégré</span><span class="d" data-l="en">built-in volume ratio</span></div>
+        <div class="eq"><span class="f">p<sub>int</sub> = p<sub>1</sub> · V<sub>i</sub><sup>k</sup></span><span class="v"><b id="gPint">–</b> bar</span><span class="d" data-l="fr">pression en fin de compression (k = 1,1)</span><span class="d" data-l="en">end-of-compression pressure (k = 1.1)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub"><span data-l="fr">Performances au R134a</span><span data-l="en">R134a performance</span></h3>
+  <div class="cols">
+    <div class="stack">
+      <div class="card calc">
+        <div class="controls"><label for="nRpm" style="flex-basis:100%"><span data-l="fr">Vitesse du compresseur</span><span data-l="en">Compressor speed</span><input id="nRpm" type="range" min="800" max="6000" step="50" value="2000"><span class="readout" id="nRpmV" style="min-width:8ch">2000 tr/min</span></label></div>
+        <div class="fields">
+          <label for="tEv"><span data-l="fr">T évaporation</span><span data-l="en">Evaporating T</span><select id="tEv"><option>-10</option><option>-5</option><option selected>0</option><option>5</option><option>10</option></select></label>
+          <label for="tCd"><span data-l="fr">T condensation</span><span data-l="en">Condensing T</span><select id="tCd"><option>40</option><option>45</option><option selected>50</option><option>55</option><option>60</option></select></label>
+          <label for="etaIs"><span data-l="fr">Rendement isentropique</span><span data-l="en">Isentropic efficiency</span><input id="etaIs" type="number" step="0.01" min="0.4" max="0.95" value="0.70"></label>
+        </div>
+        <div class="kpis">
+          <div><small><span data-l="fr">Débit massique</span><span data-l="en">Mass flow</span></small><b id="kM">–</b><i>g/s</i></div>
+          <div><small><span data-l="fr">Puissance frigorifique</span><span data-l="en">Cooling capacity</span></small><b id="kQ" style="color:var(--lp)">–</b><i>kW</i></div>
+          <div><small><span data-l="fr">Puissance absorbée</span><span data-l="en">Shaft power</span></small><b id="kP" style="color:var(--hp)">–</b><i>kW</i></div>
+          <div><small>COP</small><b id="kC">–</b><i>–</i></div>
+          <div><small><span data-l="fr">Couple moyen</span><span data-l="en">Mean torque</span></small><b id="kT">–</b><i>N·m</i></div>
+          <div><small><span data-l="fr">Taux de compression</span><span data-l="en">Pressure ratio</span></small><b id="kR">–</b><i>–</i></div>
+        </div>
+        <div class="verdict" id="kV"></div>
+      </div>
+    </div>
+    <figure class="card"><svg id="perfChart" class="chart" viewBox="0 0 520 300" role="img" aria-label="Puissances selon la vitesse"></svg>
+      <figcaption><span data-l="fr">Puissance frigorifique (bleu) et puissance absorbée sur l’arbre (rouge) en fonction de la vitesse, aux températures choisies.</span><span data-l="en">Cooling capacity (blue) and shaft power (red) against speed, at the selected temperatures.</span></figcaption></figure>
+  </div>
+  <div class="cols" style="margin-top:28px">
+    <figure class="card"><svg id="torqueChart" class="chart" viewBox="0 0 520 240" role="img" aria-label="Couple sur l’arbre sur deux tours"></svg>
+      <figcaption><span data-l="fr">Couple sur l’arbre sur deux tours, rapporté au couple moyen : compresseur scroll (orange) et compresseur à un piston (gris).</span><span data-l="en">Shaft torque over two revolutions, relative to mean torque: scroll compressor (orange) and single-piston compressor (grey).</span></figcaption></figure>
+    <div class="stack">
+      <p><span data-l="fr">Avec un piston, tout le travail se fait sur un demi-tour : le couple monte à plus de trois fois sa valeur moyenne, ce qui secoue la courroie et le moteur. Dans le scroll, plusieurs poches sont comprimées en même temps et le couple reste presque constant. C’est l’explication mécanique du « moins de vibrations, moins de bruit ».</span><span data-l="en">With a piston, all the work is done over half a turn: torque peaks at more than three times its mean, which shakes the belt and the engine. In a scroll, several pockets are compressed at once and the torque stays almost constant. This is the mechanical reason for “less vibration, less noise”.</span></p>
+      <div class="note"><b><span data-l="fr">Hypothèses de calcul</span><span data-l="en">Calculation assumptions</span></b><br><span data-l="fr">Propriétés du R134a à saturation (tables ASHRAE) ; vapeur saturée à l’aspiration, liquide saturé en sortie de condenseur ; compression polytropique k = 1,1 ; rendement volumétrique η<sub>v</sub> = 0,94 − 90/n ; géométrie du modèle 3D (simplifiée). Ordres de grandeur à confronter aux mesures.</span><span data-l="en">R134a saturation properties (ASHRAE tables); saturated vapour at suction, saturated liquid leaving the condenser; polytropic compression k = 1.1; volumetric efficiency η<sub>v</sub> = 0.94 − 90/n; 3D model geometry (simplified). Orders of magnitude to check against measurements.</span></div>
+    </div>
+  </div>
+</div></section>
+
 <section class="s" id="eclate"><div class="wrap">
-  <div class="sh"><div class="no">03</div><h2><span data-l="fr">Vue éclatée 3D et nomenclature</span><span data-l="en">3D exploded view and parts list</span></h2><div class="other"><span data-l="fr">3D exploded view</span><span data-l="en">Vue éclatée 3D</span></div></div>
+  <div class="sh"><div class="no">04</div><h2><span data-l="fr">Vue éclatée 3D et nomenclature</span><span data-l="en">3D exploded view and parts list</span></h2><div class="other"><span data-l="fr">3D exploded view</span><span data-l="en">Vue éclatée 3D</span></div></div>
   <div class="viewer">
     <div class="vmain">
       <div class="stage"><canvas id="view3d" tabindex="0" aria-label="Vue éclatée 3D interactive"></canvas></div>
@@ -475,12 +601,13 @@ footer .wrap{display:grid;gap:10px}
       <div class="plist" id="vList"></div>
     </aside>
   </div>
-  <p style="margin-top:14px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Cliquez une pièce (ou son nom) pour voir sa fonction, son matériau et son procédé d’obtention. Molette ou pincement pour zoomer, clic droit ou deux doigts pour déplacer. Modèle redessiné d’après les fichiers CATIA du TP, dans l’ordre de l’éclaté linéaire ; formes simplifiées, couleurs pédagogiques (volute mobile en doré).</span><span data-l="en">Click a part (or its name) to see its function, material and manufacturing process. Wheel or pinch to zoom, right-click or two fingers to pan. Model redrawn from the lab’s CATIA files, in the order of the linear exploded view; simplified shapes, teaching colours (orbiting scroll in gold).</span></p>
+  <p style="margin-top:14px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Raccourcis :</span><span data-l="en">Shortcuts:</span> <span class="kbd">E</span> <span data-l="fr">éclater</span><span data-l="en">explode</span> · <span class="kbd">C</span> <span data-l="fr">coupe</span><span data-l="en">section</span> · <span class="kbd">R</span> <span data-l="fr">tourner</span><span data-l="en">run</span> · <span class="kbd">B</span> <span data-l="fr">repères</span><span data-l="en">balloons</span> · <span class="kbd">I</span> <span data-l="fr">isoler</span><span data-l="en">isolate</span> · <span class="kbd">V</span> <span data-l="fr">vue</span><span data-l="en">view</span> · <span class="kbd">Échap</span></p>
+  <p style="margin-top:6px;font-size:.86rem;color:var(--muted)"><span data-l="fr">Cliquez une pièce (ou son nom) pour voir sa fonction, son matériau et son procédé d’obtention. Molette ou pincement pour zoomer, clic droit ou deux doigts pour déplacer. Modèle redessiné d’après les fichiers CATIA du TP, dans l’ordre de l’éclaté linéaire ; formes simplifiées, couleurs pédagogiques (volute mobile en doré).</span><span data-l="en">Click a part (or its name) to see its function, material and manufacturing process. Wheel or pinch to zoom, right-click or two fingers to pan. Model redrawn from the lab’s CATIA files, in the order of the linear exploded view; simplified shapes, teaching colours (orbiting scroll in gold).</span></p>
 </div></section>
 
 <!-- 05 -->
 <section class="s" id="embrayage"><div class="wrap">
-  <div class="sh"><div class="no">04</div><h2><span data-l="fr">La poulie débrayable</span><span data-l="en">The clutch pulley</span></h2><div class="other"><span data-l="fr">Electromagnetic clutch</span><span data-l="en">Embrayage électromagnétique</span></div></div>
+  <div class="sh"><div class="no">05</div><h2><span data-l="fr">La poulie débrayable</span><span data-l="en">The clutch pulley</span></h2><div class="other"><span data-l="fr">Electromagnetic clutch</span><span data-l="en">Embrayage électromagnétique</span></div></div>
   <div class="cols">
     <div class="stack">
       <div class="cstage">
@@ -512,7 +639,7 @@ footer .wrap{display:grid;gap:10px}
 
 <!-- 06 -->
 <section class="s" id="montage"><div class="wrap">
-  <div class="sh"><div class="no">05</div><h2><span data-l="fr">Graphe de montage</span><span data-l="en">Assembly chart</span></h2><div class="other"><span data-l="fr">Assembly sequence</span><span data-l="en">Ordre d’assemblage</span></div></div>
+  <div class="sh"><div class="no">06</div><h2><span data-l="fr">Graphe de montage</span><span data-l="en">Assembly chart</span></h2><div class="other"><span data-l="fr">Assembly sequence</span><span data-l="en">Ordre d’assemblage</span></div></div>
   <div class="asmgrid">
     <div class="asmside">
       <div class="asmstage">
@@ -539,7 +666,7 @@ footer .wrap{display:grid;gap:10px}
 
 <!-- 07 -->
 <section class="s" id="cinematique"><div class="wrap">
-  <div class="sh"><div class="no">06</div><h2><span data-l="fr">Schéma cinématique</span><span data-l="en">Kinematic diagram</span></h2><div class="other"><span data-l="fr">Kinematic diagram</span><span data-l="en">Schéma cinématique</span></div></div>
+  <div class="sh"><div class="no">07</div><h2><span data-l="fr">Schéma cinématique</span><span data-l="en">Kinematic diagram</span></h2><div class="other"><span data-l="fr">Kinematic diagram</span><span data-l="en">Schéma cinématique</span></div></div>
   <div class="cols">
     <figure class="svgbox">
       <svg viewBox="0 0 600 360" role="img" aria-label="Schéma cinématique minimal">
@@ -613,7 +740,7 @@ footer .wrap{display:grid;gap:10px}
 
 <!-- 08 -->
 <section class="s" id="choix"><div class="wrap">
-  <div class="sh"><div class="no">07</div><h2><span data-l="fr">Justification des choix techniques</span><span data-l="en">Why these design choices</span></h2><div class="other"><span data-l="fr">Design choices</span><span data-l="en">Choix techniques</span></div></div>
+  <div class="sh"><div class="no">08</div><h2><span data-l="fr">Justification des choix techniques</span><span data-l="en">Why these design choices</span></h2><div class="other"><span data-l="fr">Design choices</span><span data-l="en">Choix techniques</span></div></div>
   <div class="tablewrap"><table class="min640">
     <thead><tr><th><span data-l="fr">Choix</span><span data-l="en">Choice</span></th><th><span data-l="fr">Justification</span><span data-l="en">Reason</span></th><th><span data-l="fr">Fonction</span><span data-l="en">Function</span></th></tr></thead>
     <tbody>
@@ -630,7 +757,7 @@ footer .wrap{display:grid;gap:10px}
 
 <!-- 09 -->
 <section class="s" id="materiaux"><div class="wrap">
-  <div class="sh"><div class="no">08</div><h2><span data-l="fr">Identifier un matériau par sa masse volumique</span><span data-l="en">Identifying a material by its density</span></h2><div class="other"><span data-l="fr">Materials</span><span data-l="en">Matériaux</span></div></div>
+  <div class="sh"><div class="no">09</div><h2><span data-l="fr">Identifier un matériau par sa masse volumique</span><span data-l="en">Identifying a material by its density</span></h2><div class="other"><span data-l="fr">Materials</span><span data-l="en">Matériaux</span></div></div>
   <div class="cols">
     <div class="stack">
       <p><span data-l="fr">Les alliages métalliques se distinguent bien par leur masse volumique ρ = m / V. La masse se mesure à la balance de précision ; le volume d’une pièce de forme complexe, par déplacement d’eau dans un bécher gradué.</span><span data-l="en">Metal alloys are easy to tell apart by their density ρ = m / V. Mass is measured on a precision balance; the volume of a complex part by water displacement in a graduated beaker.</span></p>
@@ -673,7 +800,7 @@ footer .wrap{display:grid;gap:10px}
 
 <!-- 10 -->
 <section class="s" id="electro"><div class="wrap">
-  <div class="sh"><div class="no">09</div><h2><span data-l="fr">L’électroaimant en chiffres</span><span data-l="en">The electromagnet in numbers</span></h2><div class="other"><span data-l="fr">Electromagnet study</span><span data-l="en">Étude de l’électroaimant</span></div></div>
+  <div class="sh"><div class="no">10</div><h2><span data-l="fr">L’électroaimant en chiffres</span><span data-l="en">The electromagnet in numbers</span></h2><div class="other"><span data-l="fr">Electromagnet study</span><span data-l="en">Étude de l’électroaimant</span></div></div>
   <div class="cols">
     <div class="stack">
       <p><b><span data-l="fr">Résistance et puissance.</span><span data-l="en">Resistance and power.</span></b> <span data-l="fr">En régime permanent, la bobine se comporte comme une résistance : R = U / I et P = U·I = U² / R.</span><span data-l="en">In steady state the coil behaves like a resistor: R = U / I and P = U·I = U² / R.</span></p>
@@ -705,16 +832,62 @@ footer .wrap{display:grid;gap:10px}
   </div>
 </div></section>
 
-<!-- 11 -->
+<section class="s" id="fiche"><div class="wrap">
+  <div class="sh"><div class="no">11</div><h2><span data-l="fr">Fiche technique</span><span data-l="en">Technical data sheet</span></h2><div class="other"><span data-l="fr">Technical data sheet</span><span data-l="en">Fiche technique</span></div></div>
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><span class="eyebrow">Technical Data Sheet · Fiche technique</span><h3><span data-l="fr">Compresseur scroll de climatisation automobile</span><span data-l="en">Automotive A/C scroll compressor</span></h3></div>
+      <dl><div><dt><span data-l="fr">Fluide</span><span data-l="en">Refrigerant</span></dt><dd>R134a</dd></div><div><dt><span data-l="fr">Tension</span><span data-l="en">Voltage</span></dt><dd>12 V DC</dd></div><div><dt><span data-l="fr">Huile</span><span data-l="en">Oil</span></dt><dd>PAG</dd></div></dl>
+    </div>
+    <div class="sheet-grid">
+      <table><thead><tr><th colspan="2"><span data-l="fr">Compresseur</span><span data-l="en">Compressor</span></th></tr></thead><tbody>
+        <tr><td><span data-l="fr">Type</span><span data-l="en">Type</span></td><td><span data-l="fr">Spirales, développante de cercle</span><span data-l="en">Scroll, circle involute</span></td></tr>
+        <tr><td><span data-l="fr">Cylindrée</span><span data-l="en">Displacement</span></td><td class="mono"><span class="js-vs">–</span> <span data-l="fr">cm³/tr</span><span data-l="en">cm³/rev</span></td></tr>
+        <tr><td><span data-l="fr">Rapport de volume V<sub>i</sub></span><span data-l="en">Built-in volume ratio V<sub>i</sub></span></td><td class="mono js-vi">–</td></tr>
+        <tr><td><span data-l="fr">Rayon d’orbite e</span><span data-l="en">Orbit radius e</span></td><td class="mono"><span class="js-e">–</span> mm</td></tr>
+        <tr><td><span data-l="fr">Pas · épaisseur · hauteur</span><span data-l="en">Pitch · thickness · height</span></td><td class="mono js-pth">–</td></tr>
+        <tr><td><span data-l="fr">Anti-rotation</span><span data-l="en">Anti-rotation</span></td><td><span data-l="fr">6 billes sur pistes trempées</span><span data-l="en">6 balls on hardened tracks</span></td></tr>
+        <tr><td><span data-l="fr">Diamètre du corps</span><span data-l="en">Housing diameter</span></td><td class="mono">≈ 115 mm</td></tr>
+      </tbody></table>
+      <table><thead><tr><th colspan="2"><span data-l="fr">Performances nominales</span><span data-l="en">Nominal performance</span></th></tr></thead><tbody>
+        <tr><td><span data-l="fr">Conditions</span><span data-l="en">Conditions</span></td><td class="mono"><span data-l="fr">2000 tr/min</span><span data-l="en">2000 rpm</span> · 0 °C / 50 °C</td></tr>
+        <tr><td><span data-l="fr">Puissance frigorifique</span><span data-l="en">Cooling capacity</span></td><td class="mono"><span class="js-q">–</span> kW</td></tr>
+        <tr><td><span data-l="fr">Puissance absorbée</span><span data-l="en">Input power</span></td><td class="mono"><span class="js-p">–</span> kW</td></tr>
+        <tr><td>COP</td><td class="mono js-cop">–</td></tr>
+        <tr><td><span data-l="fr">Débit massique</span><span data-l="en">Mass flow</span></td><td class="mono"><span class="js-m">–</span> g/s</td></tr>
+        <tr><td><span data-l="fr">Couple moyen</span><span data-l="en">Mean torque</span></td><td class="mono"><span class="js-t">–</span> N·m</td></tr>
+        <tr><td><span data-l="fr">Pressions BP / HP</span><span data-l="en">LP / HP pressures</span></td><td class="mono"><span data-l="fr">2,93 / 13,2</span><span data-l="en">2.93 / 13.2</span> bar abs</td></tr>
+      </tbody></table>
+      <table><thead><tr><th colspan="2"><span data-l="fr">Embrayage</span><span data-l="en">Clutch</span></th></tr></thead><tbody>
+        <tr><td><span data-l="fr">Type</span><span data-l="en">Type</span></td><td><span data-l="fr">Électromagnétique, sec</span><span data-l="en">Electromagnetic, dry</span></td></tr>
+        <tr><td><span data-l="fr">Résistance de bobine</span><span data-l="en">Coil resistance</span></td><td class="mono"><span class="js-r">–</span> Ω</td></tr>
+        <tr><td><span data-l="fr">Puissance de bobine</span><span data-l="en">Coil power</span></td><td class="mono"><span class="js-pw">–</span> W</td></tr>
+        <tr><td><span data-l="fr">Couple transmissible (12 V)</span><span data-l="en">Transmissible torque (12 V)</span></td><td class="mono"><span class="js-ct">–</span> N·m</td></tr>
+        <tr class="hl"><td><span data-l="fr">Coefficient de sécurité</span><span data-l="en">Safety factor</span></td><td class="mono"><b class="js-sf">–</b></td></tr>
+        <tr><td><span data-l="fr">Poulie</span><span data-l="en">Pulley</span></td><td><span data-l="fr">Poly‑V 6 gorges, Ø ≈ 110 mm</span><span data-l="en">Poly‑V 6 ribs, Ø ≈ 110 mm</span></td></tr>
+      </tbody></table>
+      <table><thead><tr><th colspan="2"><span data-l="fr">Matériaux principaux</span><span data-l="en">Main materials</span></th></tr></thead><tbody>
+        <tr><td><span data-l="fr">Corps, couvercle</span><span data-l="en">Housing, rear head</span></td><td>AlSi9Cu3</td></tr>
+        <tr><td><span data-l="fr">Volutes</span><span data-l="en">Scrolls</span></td><td>Al‑Si (A390)</td></tr>
+        <tr><td><span data-l="fr">Arbre</span><span data-l="en">Shaft</span></td><td>42CrMo4</td></tr>
+        <tr><td><span data-l="fr">Roulements, billes</span><span data-l="en">Bearings, balls</span></td><td>100Cr6</td></tr>
+        <tr><td><span data-l="fr">Joints</span><span data-l="en">Seals</span></td><td>HNBR</td></tr>
+        <tr><td><span data-l="fr">Bobine</span><span data-l="en">Coil</span></td><td>Cu‑ETP</td></tr>
+      </tbody></table>
+    </div>
+    <p class="sheet-foot"><span data-l="fr">Valeurs calculées en direct à partir des sections Géométrie et Électroaimant : modifiez une cote ou une mesure et la fiche se met à jour. Le coefficient de sécurité compare le couple que l’embrayage peut transmettre au couple moyen demandé par le compresseur.</span><span data-l="en">Values are computed live from the Geometry and Electromagnet sections: change a dimension or a reading and the sheet updates. The safety factor compares the torque the clutch can transmit with the mean torque the compressor needs.</span></p>
+  </div>
+</div></section>
+
 <section class="s" id="video"><div class="wrap">
-  <div class="sh"><div class="no">10</div><h2><span data-l="fr">Le film du compresseur</span><span data-l="en">The compressor film</span></h2><div class="other"><span data-l="fr">Video</span><span data-l="en">Vidéo</span></div></div>
+  <div class="sh"><div class="no">12</div><h2><span data-l="fr">Le film du compresseur</span><span data-l="en">The compressor film</span></h2><div class="other"><span data-l="fr">Video</span><span data-l="en">Vidéo</span></div></div>
   <div class="video"><video id="vid" controls playsinline preload="metadata" src="scroll-compressor.mp4"></video></div>
-  <p style="margin-top:12px;font-size:.88rem;color:var(--muted)"><span data-l="fr">Vidéo générée à partir du même modèle 3D que cette page, sous-titrée en français et en anglais : rôle, vue éclatée, compression dans les spirales, embrayage, histoire.</span><span data-l="en">Video rendered from the same 3D model as this page, with French and English captions: role, exploded view, compression in the scrolls, clutch, history.</span></p>
+  <p style="margin-top:12px;font-size:.88rem;color:var(--muted)"><span data-l="fr">Vidéo générée à partir du même modèle 3D que cette page, sous-titrée en français et en anglais : rôle, vue éclatée, compression dans les spirales, embrayage, avantages. Rendu image par image à 30 i/s, encodé en H.264.</span><span data-l="en">Video rendered from the same 3D model as this page, with French and English captions: role, exploded view, compression in the scrolls, clutch, advantages. Rendered frame by frame at 30 fps, encoded in H.264.</span></p>
 </div></section>
 
 <!-- 12 -->
 <section class="s" id="quiz"><div class="wrap">
-  <div class="sh"><div class="no">11</div><h2><span data-l="fr">Testez-vous avant le QCM</span><span data-l="en">Test yourself before the quiz</span></h2><div class="other"><span data-l="fr">Quiz and glossary</span><span data-l="en">Quiz et lexique</span></div></div>
+  <div class="sh"><div class="no">13</div><h2><span data-l="fr">Testez-vous avant le QCM</span><span data-l="en">Test yourself before the quiz</span></h2><div class="other"><span data-l="fr">Quiz and glossary</span><span data-l="en">Quiz et lexique</span></div></div>
   <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px"><span class="score" id="qScore">0 / 0</span><button class="btn" type="button" id="qReset"><span data-l="fr">Recommencer</span><span data-l="en">Start again</span></button></div>
   <div class="quiz" id="qList"></div>
   <h3 style="margin:44px 0 14px;font-size:1.4rem"><span data-l="fr">Lexique technique FR ⇄ EN</span><span data-l="en">Technical glossary FR ⇄ EN</span></h3>
@@ -723,6 +896,13 @@ footer .wrap{display:grid;gap:10px}
 </main>
 
 <footer><div class="wrap">
+  <div class="tablewrap revs"><table>
+    <thead><tr><th><span data-l="fr">Rév.</span><span data-l="en">Rev.</span></th><th><span data-l="fr">Modification</span><span data-l="en">Change</span></th></tr></thead>
+    <tbody>
+      <tr><td class="k">A</td><td><span data-l="fr">Première édition : présentation, fonctionnement, vue éclatée 3D, vidéo</span><span data-l="en">First issue: overview, operation, 3D exploded view, video</span></td></tr>
+      <tr><td class="k">B</td><td><span data-l="fr">Montage animé en 3D, repères, diagramme P‑V, coupe de l’embrayage</span><span data-l="en">3D animated assembly, balloons, P‑V diagram, clutch section</span></td></tr>
+      <tr><td class="k">C</td><td><span data-l="fr">Géométrie cotée, calcul des performances, fiche technique</span><span data-l="en">Dimensioned geometry, performance calculation, data sheet</span></td></tr>
+    </tbody></table></div>
   <p><b><span data-l="fr">Dossier technique SAÉ 1.1 · Analyse d’un produit grand public · BUT GMP 1</span><span data-l="en">SAÉ 1.1 technical file · Consumer product analysis · BUT GMP year 1</span></b></p>
   <p><span data-l="fr">Sources : sujet de la SAÉ 1.1 et présentation de lancement ; CM en anglais « The functioning of a scroll compressor » et son corrigé ; fichiers CATIA du compresseur (nomenclature et éclaté linéaire) ; photo du compresseur du TP ; bases de données CES Selector et matweb.com. Modèle 3D, animations et vidéo réalisés en code ; formes simplifiées, non à l’échelle exacte.</span><span data-l="en">Sources: SAÉ 1.1 brief and kick-off slides; English lecture “The functioning of a scroll compressor” and its answer key; CATIA files of the compressor (bill of materials and linear exploded view); photo of the lab compressor; CES Selector and matweb.com databases. 3D model, animations and video made in code; simplified shapes, not to exact scale.</span></p>
 </div></footer>
@@ -741,6 +921,13 @@ footer .wrap{display:grid;gap:10px}
     const k = phi - alpha;
     return [A * (Math.cos(phi) + k * Math.sin(phi)), A * (Math.sin(phi) - k * Math.cos(phi))];
   }
+  SC.geo.h = 2.4; SC.geo.pitch = 2 * Math.PI * A; SC.geo.turns = (PHI1 - PHI0) / (2 * Math.PI);
+  // point (x, y) dans la paroi de la volute fixe ?
+  SC.inFixedWall = function (x, y) {
+    const rho = Math.hypot(x, y), u2 = (rho / A) ** 2 - 1; if (u2 <= 0) return false;
+    const u = Math.sqrt(u2), T2 = 2 * Math.PI; let al = Math.atan2(y, x) - (u - Math.atan(u)); al = ((al + BETA) % T2 + T2) % T2 - BETA;
+    if (al > BETA) return false; const phi = u + al; return phi >= PHI0 && phi <= PHI1;
+  };
   SC.wallOutline = function (n) {
     n = n || 420; const p = [];
     for (let i = 0; i <= n; i++) p.push(inv(PHI0 + (PHI1 - PHI0) * i / n, -BETA));
@@ -1199,6 +1386,7 @@ function setLang(l){ LANG = l; root.dataset.lang = l; root.lang = l;
   listeners.forEach(f => f()); }
 document.querySelectorAll('[data-set-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.setLang)));
 const T = o => o[LANG];
+const fmt = (x, d) => isFinite(x) ? x.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB', { maximumFractionDigits: d, minimumFractionDigits: d }) : '–';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- 3D ---------- */
@@ -1286,6 +1474,13 @@ tog('vCut', on => { cut = on; view.model.setClip(on ? [clipPlane] : []); });
 tog('vIso', on => { iso = on; applyIso(); });
 tog('vCoil', on => coil = on);
 document.getElementById('vReset').addEventListener('click', () => { view.v.tAz = 0.55; view.v.tEl = 0.3; view.v.pan.set(0, 0, 0); view.fit(); });
+// raccourcis clavier quand la souris est sur le viewer
+let vHover = false; const vmain = vCanvas.closest('.vmain'); vmain.addEventListener('pointerenter', () => vHover = true); vmain.addEventListener('pointerleave', () => vHover = false);
+addEventListener('keydown', e => { if (!vHover || e.ctrlKey || e.metaKey || e.altKey || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const k = e.key.toLowerCase(), click = id => document.getElementById(id).click();
+  if (k === 'e') { const ex2 = document.getElementById('vExplode'); ex2.value = ms.explode > 0.5 ? 0 : 100; ex2.dispatchEvent(new Event('input')); }
+  else if (k === 'c') click('vCut'); else if (k === 'r') click('vRun'); else if (k === 'b') click('vBal'); else if (k === 'i') click('vIso'); else if (k === 'v') click('vReset');
+  else if (k === 'escape') select(null); else return; e.preventDefault(); });
 const ex = document.getElementById('vExplode');
 ex.addEventListener('input', () => { ms.explode = ex.value / 100; view.model.apply(); view.fit(); });
 document.getElementById('vExplode').addEventListener('change', () => view.fit());
@@ -1333,16 +1528,18 @@ const pc = document.getElementById('pockets'), pctx = pc.getContext('2d'), pr = 
 let pTheta = 0, pPlay = !reduce; const pAngle = document.getElementById('pAngle'), pDeg = document.getElementById('pDeg');
 const css = n => getComputedStyle(root).getPropertyValue(n).trim();
 /* cycle d’une poche : aspiration (1 tour), compression (1,6 tour), refoulement (0,4 tour) */
-const PI2 = Math.PI * 2, CYC = 3 * PI2, A1 = PI2, A2 = PI2 + 3.2 * Math.PI, P1 = 3, VI = 2.6, NPOL = 1.15, PD = P1 * VI ** NPOL;
-function pvAt(a){ if (a < A1) return [a / A1, P1, 0]; if (a < A2) { const k = (a - A1) / (A2 - A1), V = 1 - k * (1 - 1 / VI); return [V, P1 * (1 / V) ** NPOL, a < A1 + 0.8 * Math.PI ? 1 : 2]; } const k = (a - A2) / (CYC - A2); return [(1 - k) / VI, PD, 3]; }
-function drawPV(a){ const svg = document.getElementById('pvChart'), W = 520, H = 250, L = 46, R = 18, Tp = 16, B = 34, pm = 11;
+const PI2 = Math.PI * 2, CYC = 3 * PI2, A1 = PI2, A2 = PI2 + 3.2 * Math.PI, NPOL = 1.1;
+let P1 = 2.93, VI = 2.05, PD = 13.18; // mis à jour par le calcul de performances
+function pvAt(a){ if (a < A1) return [a / A1, P1, 0]; if (a < A2) { const k = (a - A1) / (A2 - A1), V = 1 - k * (1 - 1 / VI); return [V, Math.min(PD, P1 * (1 / V) ** NPOL), a < A1 + 0.8 * Math.PI ? 1 : 2]; }
+  const k = (a - A2) / (CYC - A2), pint = Math.min(PD, P1 * VI ** NPOL); if (k < 0.1) return [1 / VI, pint + (PD - pint) * k / 0.1, 3]; return [(1 - (k - 0.1) / 0.9) / VI, PD, 3]; }
+function drawPV(a){ const svg = document.getElementById('pvChart'), W = 520, H = 250, L = 46, R = 18, Tp = 28, B = 34, pm = Math.max(12, Math.ceil(PD / 2) * 2 + 2);
   const X = v => L + v * (W - L - R), Y = p => H - B - p / pm * (H - Tp - B);
   if (!svg.dataset.ready) { let s = ''; for (let p = 0; p <= pm; p += 2) s += `<line x1="${L}" x2="${W - R}" y1="${Y(p)}" y2="${Y(p)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(p) + 4}" text-anchor="end">${p}</text>`;
     s += `<text x="${W - R}" y="${H - 8}" text-anchor="end">V</text><text x="${L - 8}" y="${Tp - 4}" text-anchor="end">p (bar)</text>`;
     let d = ''; for (let i = 0; i <= 240; i++) { const q = pvAt(i / 240 * CYC * 0.9999); d += (i ? 'L' : 'M') + X(q[0]).toFixed(1) + ' ' + Y(q[1]).toFixed(1); }
     s += `<path d="${d}Z" fill="color-mix(in srgb,var(--mid) 12%,transparent)" stroke="var(--muted)" stroke-width="1.5"/>`;
     s += `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(P1)}" y2="${Y(P1)}" stroke="var(--lp)" stroke-width="3"/><line x1="${X(0)}" x2="${X(1 / VI)}" y1="${Y(PD)}" y2="${Y(PD)}" stroke="var(--hp)" stroke-width="3"/>`;
-    s += `<text x="${X(0.55)}" y="${Y(P1) + 18}" fill="var(--lp)" style="fill:var(--lp)">BP · ${P1} bar</text><text x="${X(0.02)}" y="${Y(PD) - 8}" style="fill:var(--hp)">HP · ${PD.toFixed(1).replace('.', LANG === 'fr' ? ',' : '.')} bar</text>`;
+    s += `<text x="${X(0.55)}" y="${Y(P1) + 18}" fill="var(--lp)" style="fill:var(--lp)">BP · ${fmt(P1, 2)} bar</text><text x="${X(0.02)}" y="${Y(PD) - 8}" style="fill:var(--hp)">HP · ${fmt(PD, 1)} bar</text>`;
     s += `<circle id="pvDot" r="7" fill="var(--accent)" stroke="var(--panel)" stroke-width="2.5"/>`; svg.innerHTML = s; svg.dataset.ready = 1; }
   const q = pvAt(a); const dot = svg.querySelector('#pvDot'); dot.setAttribute('cx', X(q[0])); dot.setAttribute('cy', Y(q[1])); return q[2]; }
 listeners.push(() => { const s = document.getElementById('pvChart'); delete s.dataset.ready; drawPockets(); });
@@ -1432,7 +1629,6 @@ listeners.push(renderAsm);
 
 /* ---------- masse volumique ---------- */
 const MATS = [['Mg', 1.74, { fr: 'Magnésium', en: 'Magnesium' }], ['Al', 2.70, { fr: 'Alliage d’aluminium', en: 'Aluminium alloy' }], ['Ti', 4.51, { fr: 'Titane', en: 'Titanium' }], ['Zn', 7.0, { fr: 'Zamak (zinc)', en: 'Zamak (zinc)' }], ['Fe', 7.85, { fr: 'Acier / fonte', en: 'Steel / cast iron' }], ['CuZn', 8.5, { fr: 'Laiton', en: 'Brass' }], ['Cu', 8.94, { fr: 'Cuivre', en: 'Copper' }], ['Pb', 11.3, { fr: 'Plomb', en: 'Lead' }]];
-const fmt = (x, d) => isFinite(x) ? x.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-GB', { maximumFractionDigits: d, minimumFractionDigits: d }) : '–';
 function calcD(){ const m = +dM.value, v = +dV2.value - +dV1.value, e = +dE.value; const rho = m / v; const u = rho * (0.1 / m + 2 * e / v);
   document.getElementById('dRho').textContent = v > 0 ? fmt(rho, 2) + ' g/cm³' : '–'; document.getElementById('dU').textContent = v > 0 ? '± ' + fmt(u, 2) + ' g/cm³' : '–';
   let best = -1, bd = 1e9; MATS.forEach((x, i) => { const d = Math.abs(x[1] - rho); if (d < bd) { bd = d; best = i; } });
@@ -1448,7 +1644,87 @@ function calcE(){ const [U, I, f, R1, R2] = eIds.map(i => +i.value); const Rm = 
   const near = FDATA.reduce((a, b) => Math.abs(b[0] - U) < Math.abs(a[0] - U) ? b : a); document.getElementById('eTq').textContent = fmt(f * near[1] * Rm, 1) + ' N·m';
   document.getElementById('fBody').innerHTML = FDATA.map((r, i) => `<tr><td class="mono">${r[0]}</td><td><input type="number" data-i="${i}" value="${r[1]}" aria-label="F ${r[0]} V"></td><td class="mono">${fmt(f * r[1] * Rm, 1)}</td></tr>`).join('');
   document.querySelectorAll('#fBody input').forEach(inp => inp.addEventListener('change', () => { FDATA[+inp.dataset.i][1] = +inp.value; calcE(); }));
-  chart(); }
+  chart(); const f12 = (FDATA.find(r => r[0] === 12) || near)[1]; CLUTCH.R = U / I; CLUTCH.P = U * I; CLUTCH.C = f * f12 * Rm; engAll(); }
+const CLUTCH = { R: 3.33, P: 43.2, C: 30.6 };
+
+/* ---------- géométrie et performances ---------- */
+// R134a à saturation (ASHRAE) : évaporation T → [p bar abs, ρ vapeur kg/m³, h vapeur kJ/kg] ; condensation T → [p bar abs, h liquide kJ/kg]
+const R134 = { ev: { '-10': [2.006, 10.04, 392.7], '-5': [2.433, 12.01, 395.3], '0': [2.928, 14.43, 398.6], '5': [3.497, 17.13, 401.5], '10': [4.146, 20.23, 404.3] },
+  cd: { '40': [10.17, 256.4], '45': [11.60, 263.9], '50': [13.18, 271.6], '55': [14.92, 279.5], '60': [16.82, 287.5] } };
+const K = 1.1;
+function geomCalc(){ const p = +gP.value / 10, t = +gT.value / 10, h = +gH.value / 10, N = +gN.value;
+  return { p, t, h, N, e: p / 2 - t, Vs: Math.PI * p * (p - 2 * t) * h * (2 * N - 1), Vi: 2 * N - 3 > 0 ? (2 * N - 1) / (2 * N - 3) : NaN }; }
+function perfCalc(G, n, Te, Tc, eta){ const [p1, rho, hg] = R134.ev[Te], [p2, hf] = R134.cd[Tc]; const ev = Math.max(0.5, 0.94 - 90 / n);
+  const m = G.Vs * 1e-6 * n / 60 * rho * ev, ws = K / (K - 1) * p1 * 1e5 / rho * ((p2 / p1) ** ((K - 1) / K) - 1) / 1000, w = ws / eta;
+  const Q = m * (hg - hf), P = m * w; return { m, Q, P, cop: Q / P, T: P * 1000 / (2 * Math.PI * n / 60), r: p2 / p1, p1, p2, pint: p1 * G.Vi ** K, ev }; }
+const gP = document.getElementById('gP'), gT = document.getElementById('gT'), gH = document.getElementById('gH'), gN = document.getElementById('gN');
+const nRpm = document.getElementById('nRpm'), tEv = document.getElementById('tEv'), tCd = document.getElementById('tCd'), etaIs = document.getElementById('etaIs');
+const setAll = (cls, txt) => document.querySelectorAll('.' + cls).forEach(e => e.textContent = txt);
+function engAll(){ const G = geomCalc(), n = +nRpm.value, eta = Math.min(0.95, Math.max(0.3, +etaIs.value || 0.7));
+  document.getElementById('gE').textContent = fmt(G.e * 10, 2); document.getElementById('gVs').textContent = fmt(G.Vs, 1); document.getElementById('gVi').textContent = fmt(G.Vi, 2);
+  const R = perfCalc(G, n, tEv.value, tCd.value, eta);
+  document.getElementById('gPint').textContent = fmt(R.pint, 1);
+  document.getElementById('nRpmV').textContent = n + (LANG === 'fr' ? ' tr/min' : ' rpm');
+  document.getElementById('kM').textContent = fmt(R.m * 1000, 1); document.getElementById('kQ').textContent = fmt(R.Q, 2); document.getElementById('kP').textContent = fmt(R.P, 2);
+  document.getElementById('kC').textContent = fmt(R.cop, 2); document.getElementById('kT').textContent = fmt(R.T, 1); document.getElementById('kR').textContent = fmt(R.r, 2);
+  const under = R.pint < R.p2 * 0.97, over = R.pint > R.p2 * 1.03;
+  document.getElementById('kV').innerHTML = LANG === 'fr'
+    ? (under ? `<b>Sous-compression</b> : en fin de compression la poche n’est qu’à <b>${fmt(R.pint, 1)} bar</b> contre <b>${fmt(R.p2, 1)} bar</b> au refoulement. À l’ouverture, le gaz HP reflue dans la poche : petite perte d’énergie, visible sur le diagramme P‑V.` : over ? `<b>Sur-compression</b> : la poche atteint <b>${fmt(R.pint, 1)} bar</b>, plus que les <b>${fmt(R.p2, 1)} bar</b> du circuit. Le clapet s’ouvre plus tôt et limite la pression.` : `<b>Adaptation</b> : la pression interne (${fmt(R.pint, 1)} bar) correspond à la HP. Rendement optimal.`)
+    : (under ? `<b>Under-compression</b>: at the end of compression the pocket is only at <b>${fmt(R.pint, 1)} bar</b> versus <b>${fmt(R.p2, 1)} bar</b> at discharge. When it opens, HP gas flows back into the pocket: a small energy loss, visible on the P‑V diagram.` : over ? `<b>Over-compression</b>: the pocket reaches <b>${fmt(R.pint, 1)} bar</b>, above the <b>${fmt(R.p2, 1)} bar</b> line. The valve opens earlier and caps the pressure.` : `<b>Matched</b>: internal pressure (${fmt(R.pint, 1)} bar) equals the HP line. Best efficiency.`);
+  // diagramme P-V lié aux conditions choisies
+  if (isFinite(G.Vi) && (P1 !== R.p1 || VI !== G.Vi || PD !== R.p2)) { P1 = R.p1; VI = G.Vi; PD = R.p2; delete document.getElementById('pvChart').dataset.ready; drawPV(((pTheta % CYC) + CYC) % CYC); }
+  // valeurs nominales (fiche technique et en-tête)
+  const N0 = perfCalc(G, 2000, '0', '50', 0.7);
+  setAll('js-vs', fmt(G.Vs, 1)); setAll('js-vi', fmt(G.Vi, 2)); setAll('js-e', fmt(G.e * 10, 2)); setAll('js-pth', `${fmt(G.p * 10, 1)} · ${fmt(G.t * 10, 1)} · ${fmt(G.h * 10, 0)} mm`);
+  setAll('js-q', fmt(N0.Q, 2)); setAll('js-p', fmt(N0.P, 2)); setAll('js-cop', fmt(N0.cop, 2)); setAll('js-m', fmt(N0.m * 1000, 1)); setAll('js-t', fmt(N0.T, 1));
+  setAll('js-r', fmt(CLUTCH.R, 2)); setAll('js-pw', fmt(CLUTCH.P, 1)); setAll('js-ct', fmt(CLUTCH.C, 1)); setAll('js-sf', fmt(CLUTCH.C / N0.T, 1));
+  perfChart(G, n, eta); }
+function perfChart(G, n, eta){ const svg = document.getElementById('perfChart'), W = 520, H = 300, L = 46, R = 20, Tp = 22, B = 40;
+  const pts = []; for (let x = 800; x <= 6000; x += 100) pts.push([x, perfCalc(G, x, tEv.value, tCd.value, eta)]);
+  const ym = Math.max(1, Math.ceil(Math.max(...pts.map(p => p[1].Q)) * 1.15)); const X = x => L + (x - 0) / 6000 * (W - L - R), Y = y => H - B - y / ym * (H - Tp - B);
+  let s = ''; const step = ym > 8 ? 2 : 1; for (let y = 0; y <= ym; y += step) s += `<line x1="${L}" x2="${W - R}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(y) + 4}" text-anchor="end">${y}</text>`;
+  for (let x = 0; x <= 6000; x += 1000) s += `<text x="${X(x)}" y="${H - B + 18}" text-anchor="middle">${x}</text>`;
+  s += `<text x="${W - R}" y="${H - 6}" text-anchor="end">n (${LANG === 'fr' ? 'tr/min' : 'rpm'})</text><text x="${L - 8}" y="${Tp - 8}" text-anchor="end">kW</text>`;
+  const path = (f, c) => `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(f(p[1])).toFixed(1)).join('')}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
+  s += `<path d="${pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1].Q).toFixed(1)).join('')}L${X(6000)} ${Y(0)}L${X(800)} ${Y(0)}Z" fill="color-mix(in srgb,var(--lp) 10%,transparent)"/>`;
+  s += path(r => r.Q, 'var(--lp)') + path(r => r.P, 'var(--hp)');
+  const c = perfCalc(G, n, tEv.value, tCd.value, eta); s += `<line x1="${X(n)}" x2="${X(n)}" y1="${Tp}" y2="${H - B}" stroke="var(--accent)" stroke-dasharray="4 4"/>`;
+  s += `<circle cx="${X(n)}" cy="${Y(c.Q)}" r="5.5" fill="var(--lp)" stroke="var(--panel)" stroke-width="2"/><circle cx="${X(n)}" cy="${Y(c.P)}" r="5.5" fill="var(--hp)" stroke="var(--panel)" stroke-width="2"/>`;
+  const lx = X(n) > W / 2 ? X(n) - 10 : X(n) + 10, an = X(n) > W / 2 ? 'end' : 'start';
+  s += `<text x="${lx}" y="${Y(c.Q) - 10}" text-anchor="${an}" style="fill:var(--lp)">Q = ${fmt(c.Q, 2)} kW</text><text x="${lx}" y="${Y(c.P) - 10}" text-anchor="${an}" style="fill:var(--hp)">P = ${fmt(c.P, 2)} kW</text>`;
+  svg.innerHTML = s; }
+function torqueChart(){ const svg = document.getElementById('torqueChart'), W = 520, H = 240, L = 40, R = 16, Tp = 16, B = 36, ym = 3.5;
+  const X = a => L + a / 720 * (W - L - R), Y = y => H - B - y / ym * (H - Tp - B);
+  let s = ''; for (let y = 0; y <= 3; y++) s += `<line x1="${L}" x2="${W - R}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--line)"/><text x="${L - 8}" y="${Y(y) + 4}" text-anchor="end">${y}</text>`;
+  for (let a = 0; a <= 720; a += 180) s += `<text x="${X(a)}" y="${H - B + 18}" text-anchor="middle">${a}°</text>`;
+  let dp = '', ds = ''; for (let a = 0; a <= 720; a += 4) { const r = a * Math.PI / 180; dp += (a ? 'L' : 'M') + X(a).toFixed(1) + ' ' + Y(Math.PI * Math.max(0, Math.sin(r))).toFixed(1); ds += (a ? 'L' : 'M') + X(a).toFixed(1) + ' ' + Y(1 + 0.05 * Math.sin(2 * r) + 0.02 * Math.sin(4 * r + 1)).toFixed(1); }
+  s += `<path d="${dp}" fill="none" stroke="var(--muted)" stroke-width="2"/><path d="${ds}" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
+  s += `<text x="${X(90)}" y="${Y(Math.PI) - 6}" text-anchor="middle">${LANG === 'fr' ? 'piston' : 'piston'} · ×3,1</text><text x="${X(540)}" y="${Y(1.05) - 10}" text-anchor="middle" style="fill:var(--accent-ink)">scroll · ×1,07</text>`;
+  s += `<text x="${L - 8}" y="${Tp - 4}" text-anchor="end">C/C̄</text>`; svg.innerHTML = s; }
+function drawGeo(){ const svg = document.getElementById('geoSvg'), s = 52, g = SC.geo, wall = SC.wallOutline(500);
+  const P = (pts, sx, ox) => 'M' + pts.map(q => ((sx * q[0] + ox) * s).toFixed(1) + ' ' + (-(sx * q[1]) * s).toFixed(1)).join('L') + 'Z';
+  // relevé des parois le long de l’axe x positif
+  const iv = []; let inn = false, st = 0; for (let r = 0.05; r < g.rimIn; r += 0.002) { const w = SC.inFixedWall(r, 0); if (w && !inn) { st = r; inn = true; } if (!w && inn) { iv.push([st, r]); inn = false; } }
+  const mm = v => fmt(v * 10, 1); let o = `<defs><pattern id="hFix" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="var(--panel2)"/><line x1="0" y1="0" x2="0" y2="7" stroke="var(--muted)" stroke-width="1.2"/></pattern><pattern id="hMob" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><rect width="7" height="7" fill="color-mix(in srgb,#d9b56d 22%,var(--panel))"/><line x1="0" y1="0" x2="0" y2="7" stroke="#b8862a" stroke-width="1.2"/></pattern>
+    <marker id="ar" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 1.5L10 5L0 8.5Z" fill="var(--ink)"/></marker></defs>`;
+  o += `<line class="axis" x1="-290" y1="0" x2="290" y2="0"/><line class="axis" x1="0" y1="-290" x2="0" y2="290"/>`;
+  o += `<path class="wf" d="M${-g.rimOut * s} 0A${g.rimOut * s} ${g.rimOut * s} 0 1 0 ${g.rimOut * s} 0A${g.rimOut * s} ${g.rimOut * s} 0 1 0 ${-g.rimOut * s} 0ZM${-g.rimIn * s} 0A${g.rimIn * s} ${g.rimIn * s} 0 1 1 ${g.rimIn * s} 0A${g.rimIn * s} ${g.rimIn * s} 0 1 1 ${-g.rimIn * s} 0Z" fill-rule="evenodd"/>`;
+  o += `<path class="wf" d="${P(wall, 1, 0)}"/><path class="wm" d="${P(wall, -1, g.orbit)}"/>`;
+  // cote du pas p et de l’épaisseur t (sous l’axe)
+  if (iv.length >= 3) { const a = iv[1], b = iv[2], yP = 62, yT = 30;
+    o += `<line class="ext" x1="${a[0] * s}" y1="4" x2="${a[0] * s}" y2="${yP + 8}"/><line class="ext" x1="${b[0] * s}" y1="4" x2="${b[0] * s}" y2="${yP + 8}"/>`;
+    o += `<line class="dim" x1="${a[0] * s}" y1="${yP}" x2="${b[0] * s}" y2="${yP}" marker-start="url(#ar)" marker-end="url(#ar)"/><text x="${(a[0] + b[0]) / 2 * s}" y="${yP + 20}" text-anchor="middle">p = ${mm(g.pitch)}</text>`;
+    o += `<line class="ext" x1="${b[1] * s}" y1="4" x2="${b[1] * s}" y2="${yT + 8}"/><line class="dim" x1="${b[0] * s - 26}" y1="${yT}" x2="${b[0] * s}" y2="${yT}" marker-end="url(#ar)"/><line class="dim" x1="${b[1] * s + 26}" y1="${yT}" x2="${b[1] * s}" y2="${yT}" marker-end="url(#ar)"/><text x="${b[1] * s + 30}" y="${yT + 5}">t = ${mm(g.t)}</text>`; }
+  // rayon d’orbite e
+  o += `<circle cx="0" cy="0" r="${g.orbit * s}" fill="none" stroke="#b8862a" stroke-dasharray="4 3"/><line class="dim" x1="0" y1="0" x2="${(g.orbit * s * Math.cos(-2.3)).toFixed(1)}" y2="${(g.orbit * s * Math.sin(-2.3)).toFixed(1)}" marker-end="url(#ar)"/>`;
+  o += `<line class="ext" x1="${(g.orbit * s * Math.cos(-2.3)).toFixed(1)}" y1="${(g.orbit * s * Math.sin(-2.3)).toFixed(1)}" x2="-95" y2="-118"/><text x="-100" y="-122" text-anchor="end">e = ${mm(g.orbit)}</text>`;
+  // diamètre extérieur
+  const yD = -g.rimOut * s - 18; o += `<line class="ext" x1="${-g.rimOut * s}" y1="-4" x2="${-g.rimOut * s}" y2="${yD - 6}"/><line class="ext" x1="${g.rimOut * s}" y1="-4" x2="${g.rimOut * s}" y2="${yD - 6}"/>`;
+  o += `<line class="dim" x1="${-g.rimOut * s}" y1="${yD}" x2="${g.rimOut * s}" y2="${yD}" marker-start="url(#ar)" marker-end="url(#ar)"/><text x="0" y="${yD - 6}" text-anchor="middle">Ø ${mm(2 * g.rimOut)}</text>`;
+  o += `<text x="310" y="310" text-anchor="end" style="font-size:11px;fill:var(--muted)">${LANG === 'fr' ? 'cotes en mm' : 'dimensions in mm'} · θ = 0°</text>`;
+  svg.innerHTML = o; }
+[gP, gT, gH, gN, nRpm, tEv, tCd, etaIs].forEach(i => i.addEventListener('input', engAll));
+listeners.push(drawGeo, torqueChart);
 function chart(){ const svg = document.getElementById('fChart'), W = 480, H = 280, L = 52, R = 16, Tp = 16, B = 40;
   const xm = 16, ym = Math.ceil(Math.max(...FDATA.map(r => r[1])) * 1.15 / 500) * 500; const X = u => L + u / xm * (W - L - R), Y = f => H - B - f / ym * (H - Tp - B);
   const k = (FDATA[0][1] / FDATA[0][0] ** 2 + FDATA[1][1] / FDATA[1][0] ** 2) / 2;

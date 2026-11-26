@@ -10,13 +10,15 @@ Bilingual (FR / EN) technical file on an automotive A/C scroll compressor — SA
 |---|---|---|
 | 01 | Présentation fonctionnelle, boucle de clim, bête à cornes, fonctions FP/FC | Functional overview, A/C loop, need statement, functions |
 | 02 | Fonctionnement : poches calculées en temps réel + diagramme P‑V | How it works: pockets computed in real time + P‑V diagram |
-| 03 | Vue éclatée 3D interactive, repères numérotés, nomenclature des 38 pièces CATIA | Interactive 3D exploded view, numbered balloons, 38-part CATIA bill of materials |
-| 04 | Poulie débrayable en coupe 3D | Clutch pulley in 3D section |
-| 05 | Graphe de montage animé en 3D (montage / démontage) | 3D animated assembly chart (assembly / disassembly) |
-| 06 | Schéma cinématique et liaisons | Kinematic diagram and joints |
-| 07–09 | Choix techniques, matériaux (calcul de masse volumique), électroaimant | Design choices, materials (density calculator), electromagnet |
-| 10 | Vidéo de présentation (72 s, sous-titres FR + EN) | Presentation video (72 s, FR + EN captions) |
-| 11 | Quiz et lexique FR ⇄ EN | Quiz and FR ⇄ EN glossary |
+| 03 | Plan coté des spirales, cylindrée, rapport de volume, performances au R134a (débit, froid, puissance, COP, couple) | Dimensioned scroll drawing, displacement, volume ratio, R134a performance (mass flow, cooling, power, COP, torque) |
+| 04 | Vue éclatée 3D interactive, repères numérotés, nomenclature des 38 pièces CATIA | Interactive 3D exploded view, numbered balloons, 38-part CATIA bill of materials |
+| 05 | Poulie débrayable en coupe 3D | Clutch pulley in 3D section |
+| 06 | Graphe de montage animé en 3D (montage / démontage) | 3D animated assembly chart (assembly / disassembly) |
+| 07 | Schéma cinématique et liaisons | Kinematic diagram and joints |
+| 08–10 | Choix techniques, matériaux (calcul de masse volumique), électroaimant | Design choices, materials (density calculator), electromagnet |
+| 11 | Fiche technique calculée en direct, coefficient de sécurité de l'embrayage | Live-computed data sheet, clutch safety factor |
+| 12 | Vidéo de présentation (72 s, sous-titres FR + EN) | Presentation video (72 s, FR + EN captions) |
+| 13 | Quiz et lexique FR ⇄ EN | Quiz and FR ⇄ EN glossary |
 
 ## Fichiers · Files
 
